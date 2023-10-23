@@ -1,4 +1,5 @@
 builds/
+.vscode/
 proj/.vscode
 proj/test_main.cpp
 proj/test_main.exe
