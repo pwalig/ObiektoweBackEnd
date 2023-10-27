@@ -4,6 +4,7 @@
 #include <stdio.h>
 
 // UTILS
+
 float FastSigmoid(const float & x){
     return 0.5 * (x / (1 + std::abs(x))) + 0.5;
 }
@@ -23,6 +24,7 @@ float* RandomList(const int & _size, const float & _min, const float & _max){
 
 
 // NEURON
+
 Neuron::Neuron():activation(0), bias(0), connectionsCount(0), connections(nullptr){}
 
 Neuron::Neuron(const int & _connectionsCount, Neuron* _inputNeurons):activation(0), bias(0), connectionsCount(_connectionsCount){
@@ -37,11 +39,12 @@ Neuron::Neuron(const int & _connectionsCount, Neuron* _inputNeurons):activation(
 Neuron::Neuron(const Neuron & _neuron):activation(_neuron.activation), bias(_neuron.bias), connectionsCount(_neuron.connectionsCount){
     this->connections = new WeightedConnection[_neuron.connectionsCount];
     for (int i = 0; i < _neuron.connectionsCount; i++) {
-        this->connections[i] = _neuron.connections[i];
+        this->connections[i].neuron = _neuron.connections[i].neuron;
+        this->connections[i].weight = _neuron.connections[i].weight;
     }
 }
 
-void Neuron::SetConnections(const int & _connectionsCount, Neuron* _inputNeurons){
+void Neuron::CreateConnections(const int & _connectionsCount, Neuron* _inputNeurons){
     if (this->connections != nullptr){
         delete [] this->connections;
     }
@@ -51,6 +54,23 @@ void Neuron::SetConnections(const int & _connectionsCount, Neuron* _inputNeurons
         this->connections[i].neuron = &_inputNeurons[i];
     }
     this->connectionsCount = _connectionsCount;
+}
+
+void Neuron::CreateConnections(const int & _connectionsCount, Neuron* _inputNeurons, float* _weights){
+    if (this->connections != nullptr){
+        delete [] this->connections;
+    }
+    this->connections = new WeightedConnection[_connectionsCount];
+    for (int i = 0; i < _connectionsCount; i++)
+    {
+        this->connections[i].neuron = &_inputNeurons[i];
+        this->connections[i].weight = _weights[i];
+    }
+    this->connectionsCount = _connectionsCount;
+}
+
+int Neuron::GetConnectionsCount(){
+    return this->connectionsCount;
 }
 
 float Neuron::GetActivation(){
@@ -66,10 +86,18 @@ float Neuron::GetBias(){
     return this->bias;
 }
 
-void Neuron::SetWeights(float* _weights){
-    for (int i = 0; i < connectionsCount; i++){
+void Neuron::SetWeights(const int & _size, float* _weights){
+    for (int i = 0; i < connectionsCount && i <_size; i++){
         this->connections[i].weight = _weights[i];
     }
+}
+
+float* Neuron::GetWeights(){
+    float* out = new float[this->connectionsCount];
+    for (int i = 0; i < connectionsCount; i++){
+        out[i] = this->connections[i].weight;
+    }
+    return out;
 }
 
 void Neuron::SetBias(const float & _bias){
@@ -94,11 +122,14 @@ void Neuron::PrintInfo(){
 }
 
 Neuron::~Neuron(){
-    delete [] connections;
+    if (connections){
+        delete [] connections;
+    }
 }
 
 
 // NEURAL LAYER
+
 void NeuralLayer::Initialise(const int & _neuronCount){
     if (this->neurons != nullptr)
         delete [] this->neurons;
@@ -112,27 +143,43 @@ NeuralLayer::NeuralLayer(const int & _neuronCount){
 
 
 // NEURAL NETWORK
+
 NeuralNetwork::NeuralNetwork():neurons(nullptr), layers(0), layerSizes(nullptr){}
 
-NeuralNetwork::NeuralNetwork(const int & _layers, int* _layerSizes){
+NeuralNetwork::NeuralNetwork(const int & _layers, int* _layerSizes):layers(_layers){
     this->neurons = new Neuron*[_layers];
     this->layerSizes = new int[_layers];
-    this->layers = _layers;
     for (int i = 0; i <_layers; i++){
         this->neurons[i] = new Neuron[_layerSizes[i]];
         this->layerSizes[i] = _layerSizes[i];
         for (int j = 0; i > 0 && j < _layerSizes[i]; j++){
-            this->neurons[i][j].SetConnections(_layerSizes[i-1], this->neurons[i-1]);
+            this->neurons[i][j].CreateConnections(_layerSizes[i-1], this->neurons[i-1]);
         }
     }
 }
 
+NeuralNetwork::NeuralNetwork(const NeuralNetwork & _neuralNetwork):layers(_neuralNetwork.layers){
+    this->layerSizes = new int [_neuralNetwork.layers];
+    this->neurons = new Neuron* [_neuralNetwork.layers];
+    for (int i = 0; i < _neuralNetwork.layers; i++){
+        this->layerSizes[i] = _neuralNetwork.layerSizes[i];
+        this->neurons[i] = new Neuron [_neuralNetwork.layerSizes[i]];
+        if (i==0) continue;
+        for (int j = 0; j < _neuralNetwork.layerSizes[i]; j++){
+            float* _weights = _neuralNetwork.neurons[i][j].GetWeights();
+            this->neurons[i][j].SetBias(_neuralNetwork.neurons[i][j].GetBias());
+            this->neurons[i][j].SetActivation(_neuralNetwork.neurons[i][j].GetActivation());
+            this->neurons[i][j].CreateConnections(this->layerSizes[i-1], this->neurons[i-1], _weights);
+            delete [] _weights;
+        }
+    }
+}
 
 void NeuralNetwork::RandomizeLayerWeights(const int & layerId){
     if (layerId == 0) return;
     for (int i = 0; i < layerSizes[layerId]; i++){
         float* _weights = RandomList(layerSizes[layerId-1], -5.0, 5.0);
-        neurons[layerId][i].SetWeights(_weights);
+        neurons[layerId][i].SetWeights(layerSizes[layerId-1], _weights);
         delete [] _weights;
     }
 }
@@ -147,7 +194,7 @@ void NeuralNetwork::RandomizeLayer(const int & layerId){
     if (layerId == 0) return;
     for (int i = 0; i < layerSizes[layerId]; i++){
         float* _weights = RandomList(layerSizes[layerId-1], -5.0, 5.0);
-        neurons[layerId][i].SetWeights(_weights);
+        neurons[layerId][i].SetWeights(layerSizes[layerId-1], _weights);
         delete [] _weights;
         float _bias = RanodmFloat(-10.0, 10.0);
         neurons[layerId][i].SetBias(_bias);
@@ -213,7 +260,7 @@ float* NeuralNetwork::EvaluateGetDecision(const int & _count, int* _inputs){
 }
 
 void NeuralNetwork::PrintInfo(){
-    printf("Layers: %d\n", layers);
+    printf("NeuralLayer Info:\nLayers: %d\n", layers);
     for (int i = 0; i < layers; i++){
         printf("--Layer %d: Neurons: %d\n", i, layerSizes[i]);
         for (int j = 0; j < layerSizes[i]; j++){
@@ -235,7 +282,11 @@ NeuralNetwork::~NeuralNetwork(){
 void NeuronTest(){
     printf("Running Neuron Test:\n");
     Neuron n;
+    n.SetBias(15);
     n.PrintInfo();
+
+    Neuron n2 = n;
+    n2.PrintInfo();
 }
 
 void NeuralNetworkTest(){
@@ -246,4 +297,8 @@ void NeuralNetworkTest(){
     nn.RandomizeNetwork();
     nn.EvaluateNetwork(layers, layerSiz);
     nn.PrintInfo();
+
+    NeuralNetwork nn2 = nn;
+    nn2.PrintInfo();
+    printf("Test finished");
 }

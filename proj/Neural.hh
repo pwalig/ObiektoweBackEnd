@@ -21,13 +21,16 @@ class Neuron{
     Neuron();
     Neuron(const int & _connectionsCount, Neuron* _inputNeurons);
     Neuron(const Neuron & _neuron);
-    void SetConnections(const int & _connectionsCount, Neuron* _inputNeurons);
+    void CreateConnections(const int & _connectionsCount, Neuron* _inputNeurons);
+    void CreateConnections(const int & _connectionsCount, Neuron* _inputNeurons, float* _weights);
 
+    int GetConnectionsCount();
     float GetActivation();
     void SetActivation(const float & _activation);
     float GetBias();
     void SetBias(const float & _bias);
-    void SetWeights(float* _weights);
+    float* GetWeights();
+    void SetWeights(const int & _size, float* _weights);
     float EvaluateActivation();
 
     void PrintInfo();
@@ -58,6 +61,7 @@ class NeuralNetwork {
     public:
     NeuralNetwork();
     NeuralNetwork(const int & _layers, int* _layerSizes);
+    NeuralNetwork(const NeuralNetwork & _neuralNetwork);
 
     void RandomizeLayerWeights(const int & layerId);
     void RandomizeLayerBiases(const int & layerId);
