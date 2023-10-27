@@ -3,11 +3,11 @@
 #include "player.hh"
 
 class Game {
-    private:
+    protected:
     Player* players = nullptr;
     int inputs;
     int outputs;
     public:
     void SetPlayers(const int & _amount, Player* _players);
-    virtual void Play();
+    //virtual void Play();
 };

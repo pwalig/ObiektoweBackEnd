@@ -6,4 +6,6 @@
 class AiModel : public Player{
     private:
     NeuralNetwork neuralNetwork;
+    public:
+    virtual int GetDecision();
 };
