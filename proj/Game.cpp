@@ -10,3 +10,7 @@ void Game::Play(){ }
 int Game::GetWinner(){
     return 0;
 }
+
+float Game::GetScore(const int & _playerId){
+    return 0.0;
+}

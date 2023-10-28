@@ -12,4 +12,5 @@ class Game {
     void SetPlayers(const int & _amount, Player* _players);
     virtual void Play();
     virtual int GetWinner();
+    virtual float GetScore(const int & _playerId);
 };

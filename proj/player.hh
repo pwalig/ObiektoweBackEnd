@@ -1,6 +1,14 @@
 class Player
 {
     public:
-    virtual int GetDecision(const int & _inputSize, float * inputs, const int & requestNo);
-    virtual int GetDecision(const int & _inputSize, int * inputs, const int & requestNo);
+    bool requireDisplay;
+    static float* ConvertIntToFloat(const int & _size, int * _values, const bool & normalize);
+    virtual int GetDecision(const int & _inputSize, float * _inputs, const int & requestNo);
+};
+
+class HumanPlayer : public Player
+{
+    public:
+    HumanPlayer();
+    virtual int GetDecision(const int & _inputSize, float * _inputs, const int & requestNo);
 };

@@ -8,6 +8,6 @@ class AiModel : public Player{
     NeuralNetwork neuralNetwork;
     int * sortedDecisions;
     public:
-    virtual int GetDecision(const int & _inputSize, float * inputs, const int & requestNo);
-    virtual int GetDecision(const int & _inputSize, int * inputs, const int & requestNo);
+    AiModel(const NeuralNetwork & _neuralNetwork);
+    virtual int GetDecision(const int & _inputSize, float * _inputs, const int & requestNo);
 };
