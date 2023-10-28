@@ -70,13 +70,13 @@ class NeuralNetwork {
     void RandomizeNetworkBiases();
     void RandomizeNetwork();
 
-    void SetInputs(const int & _count, int* _inputs);
+    void SetInputs(const int & _count, float* _inputs);
     void EvaluateLayer(const int & layerId);
     void EvaluateNetwork();
-    void EvaluateNetwork(const int & _count, int* _inputs);
+    void EvaluateNetwork(const int & _count, float* _inputs);
     float* GetDecision();
     float* EvaluateGetDecision();
-    float* EvaluateGetDecision(const int & _count, int* _inputs);
+    float* EvaluateGetDecision(const int & _count, float* _inputs);
 
     void PrintInfo();
 
