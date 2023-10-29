@@ -264,7 +264,7 @@ void UltimateTicTacToeTest(){
     int layerSizes[4] = {out, 16, 16, in};
     AiModel player2(4, layerSizes);
     player2.GetNeuralNetwork()->RandomizeNetwork();
-    player2.GetNeuralNetwork()->PrintInfo();
+    player2.GetNeuralNetwork()->PrintInfo(true, true, false);
 
     Player* playerList[2] = {&player1, &player2};
     UltimateTicTacToe ttt(2, playerList);

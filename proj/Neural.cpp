@@ -123,10 +123,12 @@ float Neuron::EvaluateActivation(){
     return this->activation;
 }
 
-void Neuron::PrintInfo(){
+void Neuron::PrintInfo(const bool & _weights){
     printf("Activation: %f | Bias: %f | Connections: %d\n", activation, bias, connectionsCount);
-    for(int i = 0; i < connectionsCount; i++){
-        printf("--Connection %d: Wieght: %f\n", i, connections[i].weight);
+    if (_weights) {
+        for(int i = 0; i < connectionsCount; i++){
+            printf("--Connection %d: Wieght: %f\n", i, connections[i].weight);
+        }
     }
 }
 
@@ -350,13 +352,15 @@ int* NeuralNetwork::EvaluateGetSortedDecisions(const int & _count, float* _input
     return GetSortedDecisions();
 }
 
-void NeuralNetwork::PrintInfo(){
+void NeuralNetwork::PrintInfo(const bool & _skipInputLayer, const bool & _neurons, const bool & _weights){
     printf("NeuralLayer Info:\nLayers: %d\n", layers);
-    for (int i = 0; i < layers; i++){
+    for (int i = (_skipInputLayer ? 1 : 0); i < layers; i++){
         printf("--Layer %d: Neurons: %d\n", i, layerSizes[i]);
-        for (int j = 0; j < layerSizes[i]; j++){
-            printf("----Neuron %d: ", j);
-            neurons[i][j].PrintInfo();
+        if (_neurons) {
+            for (int j = 0; j < layerSizes[i]; j++){
+                printf("----Neuron %d: ", j);
+                neurons[i][j].PrintInfo(_weights);
+            }
         }
     }
 }
@@ -370,14 +374,15 @@ NeuralNetwork::~NeuralNetwork(){
 }
 
 // TESTS
+
 void NeuronTest(){
     printf("Running Neuron Test:\n");
     Neuron n;
     n.SetBias(15);
-    n.PrintInfo();
+    n.PrintInfo(true);
 
     Neuron n2 = n;
-    n2.PrintInfo();
+    n2.PrintInfo(true);
 }
 
 void NeuralNetworkTest(){
@@ -392,10 +397,10 @@ void NeuralNetworkTest(){
     
     float inputs[3] = {0.3, 0.8, 0.1};
     nn.EvaluateNetwork(layers, inputs);
-    nn.PrintInfo();
+    nn.PrintInfo(false, true, true);
 
     nn2.EvaluateNetwork(layers, inputs);
-    nn2.PrintInfo();
+    nn2.PrintInfo(false, true, true);
 
     printf("Test finished");
 }

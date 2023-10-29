@@ -34,7 +34,7 @@ class Neuron{
     void SetWeights(const int & _size, float* _weights);
     float EvaluateActivation();
 
-    void PrintInfo();
+    void PrintInfo(const bool & _weights);
 
     ~Neuron();
 };
@@ -90,11 +90,12 @@ class NeuralNetwork {
     int* EvaluateGetSortedDecisions();
     int* EvaluateGetSortedDecisions(const int & _count, float* _inputs);
 
-    void PrintInfo();
+    void PrintInfo(const bool & _skipInputLayer, const bool & _neurons, const bool & _weights);
 
     ~NeuralNetwork();
 };
 
 // TESTS
+
 void NeuronTest();
 void NeuralNetworkTest();

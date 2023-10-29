@@ -35,7 +35,7 @@ void AiModelTest(){
     
     float inputs[3] = {0.3, 0.8, 0.1};
     int dec = am.GetDecision(layers, inputs, 0);
-    am.GetNeuralNetwork()->PrintInfo();
+    am.GetNeuralNetwork()->PrintInfo(false, true, true);
 
     printf("Decision no 1: %d\n", dec);
     dec = am.GetDecision(layers, inputs, 1);
@@ -46,5 +46,4 @@ void AiModelTest(){
     printf("Decision no 4: %d\n", dec);
     dec = am.GetDecision(layers, inputs, 4);
     printf("Decision no 5: %d\n", dec);
-
 }
