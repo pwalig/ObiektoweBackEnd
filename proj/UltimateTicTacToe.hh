@@ -53,7 +53,7 @@ class UTTTBoard {
     //TTTBoard GetBoardByIndexes(const int & _i, const int & _j);
     
     void Render();
-    void HelperWinners(const int & _curBoard);
+    void HelperBoard(const int & _curBoard);
 
     friend class UltimateTicTacToe;
 };
@@ -68,10 +68,23 @@ class UltimateTicTacToe : public Game {
     char marks [2];
     
     bool display[2];
+    float* GetBoardState(const bool & chooseBoard);
 
     public:
+    //Creating TicTacToe game with no players can cause errors.
+    //Remember to add players before you call Play();
     UltimateTicTacToe();
-    void Play();
+
+    UltimateTicTacToe(const int & _amount, Player** _players);
+    virtual void SetPlayers(const int & _amount, Player** _players);
+
+    // get the amount of different actions you can take in the Game
+    static int GetInputs();
+
+    // get the amount variables on which game state can be written
+    static int GetOutputs();
+
+    virtual void Play();
 };
 
 
