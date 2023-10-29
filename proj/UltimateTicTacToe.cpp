@@ -135,9 +135,10 @@ void UTTTBoard::HelperBoard(const int & _curBoard){
 
 // ULTIMATE TIC TAC TOE
 
+const int UltimateTicTacToe::inputs = 9;
+const int UltimateTicTacToe::outputs = 91;
+
 UltimateTicTacToe::UltimateTicTacToe():Game(), curBoard(-1) {
-    this->inputs = 9;
-    this->outputs = 82;
     marks[0] = 'o';
     marks[1] = 'x';
     display[0] = true;
@@ -158,25 +159,37 @@ void UltimateTicTacToe::SetPlayers(const int & _amount, Player** _players){
     if (_amount > 1) display[1] = this->players[1]->requireDisplay;
 }
 
-float* UltimateTicTacToe::GetBoardState(const bool & chooseBoard){
-    float* out = new float[82];
+float* UltimateTicTacToe::GetBoardState(){
+    float* out = new float[UltimateTicTacToe::outputs];
     for (int i = 0; i < 9; i++){
         for (int j = 0; j < 9; j++){
             out[i*9+j] = board.boards[i].fields[j];
         }
     }
-    out[81] = chooseBoard ? 1.0 : 0.0; // last variable informs weather the move is for choosing the board or field
+    for (int i = 0; i < 9; i++){
+        out[81+i] = ((curBoard == i) ? 1.0 : 0.0);
+    }
+    out[90] = ((curBoard == -1) ? 1.0 : 0.0); // last variable informs weather the move is for choosing the board or field
     return out;
 }
 
 // get the amount of different actions you can take in the Game
 int UltimateTicTacToe::GetInputs() {
-    return 9;
+    return UltimateTicTacToe::inputs;
 }
 
 // get the amount variables on which game state can be written
 int UltimateTicTacToe::GetOutputs() {
-    return 82;
+    return UltimateTicTacToe::outputs;
+}
+
+// get the amount of different actions you can take in the Game
+int UltimateTicTacToe::GetInstanceInputs(){
+    return UltimateTicTacToe::inputs;
+}
+// get the amount of variables on which game state can be written
+int UltimateTicTacToe::GetInstanceOutputs(){
+    return UltimateTicTacToe::outputs;
 }
 
 
@@ -193,8 +206,9 @@ void UltimateTicTacToe::Play() {
             int requestNo = 0;
             do {
                 if (display[curPlayer]) printf("Choose board: ");
-                float* boardState = GetBoardState(true);
-                choice = this->players[curPlayer]->GetDecision(this->inputs, boardState, requestNo);
+                float* boardState = GetBoardState();
+                choice = this->players[curPlayer]->GetDecision(UltimateTicTacToe::outputs, boardState, requestNo);
+                delete [] boardState;
                 requestNo++;
             } while (this->board.GetBoardByIndex(choice).IsFull() || board.wins[choice] != EMPTY_MARK);
             curBoard = choice;
@@ -204,8 +218,9 @@ void UltimateTicTacToe::Play() {
         // field choice
         do {
             if (display[curPlayer]) printf("Choose field on board %d: ", curBoard);
-            float* boardState = GetBoardState(true);
-            choice = this->players[curPlayer]->GetDecision(this->inputs, boardState, requestNo);
+            float* boardState = GetBoardState();
+            choice = this->players[curPlayer]->GetDecision(UltimateTicTacToe::outputs, boardState, requestNo);
+            delete [] boardState;
             requestNo++;
         } while (this->board.GetBoardByIndex(curBoard).fields[choice] != EMPTY_MARK);
 
@@ -249,6 +264,7 @@ void UltimateTicTacToeTest(){
     int layerSizes[4] = {out, 16, 16, in};
     AiModel player2(4, layerSizes);
     player2.GetNeuralNetwork()->RandomizeNetwork();
+    player2.GetNeuralNetwork()->PrintInfo();
 
     Player* playerList[2] = {&player1, &player2};
     UltimateTicTacToe ttt(2, playerList);

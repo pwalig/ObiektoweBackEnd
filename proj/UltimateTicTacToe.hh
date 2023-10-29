@@ -61,14 +61,17 @@ class UTTTBoard {
 class UltimateTicTacToe : public Game {
     UTTTBoard board;
     int curBoard;
+    
+    const static int inputs;
+    const static int outputs;
+    bool display[2];
 
     // available marks:
     // 0 - player 0 mark
     // 1 - player 1 mark
     char marks [2];
     
-    bool display[2];
-    float* GetBoardState(const bool & chooseBoard);
+    float* GetBoardState();
 
     public:
     //Creating TicTacToe game with no players can cause errors.
@@ -80,9 +83,12 @@ class UltimateTicTacToe : public Game {
 
     // get the amount of different actions you can take in the Game
     static int GetInputs();
-
-    // get the amount variables on which game state can be written
+    // get the amount of variables on which game state can be written
     static int GetOutputs();
+    // get the amount of different actions you can take in the Game
+    virtual int GetInstanceInputs();
+    // get the amount of variables on which game state can be written
+    virtual int GetInstanceOutputs();
 
     virtual void Play();
 };
