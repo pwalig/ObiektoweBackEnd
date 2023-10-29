@@ -15,6 +15,7 @@ float* Player::ConvertIntToFloat(const int & _size, int * _values, const bool & 
             floatValues[i] /= _max;
         }
     }
+    return floatValues;
 }
 
 int Player::GetDecision(const int & _inputSize, float * inputs, const int & requestNo){

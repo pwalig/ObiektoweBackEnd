@@ -32,9 +32,18 @@ Neuron::Neuron(const int & _connectionsCount, Neuron* _inputNeurons):activation(
     for (int i = 0; i < _connectionsCount; i++)
     {
         this->connections[i].neuron = &_inputNeurons[i];
+        this->connections[i].weight = 0.0;
     }
 }
 
+Neuron::Neuron(const int & _connectionsCount, Neuron* _inputNeurons, float* _weights):activation(0), bias(0), connectionsCount(_connectionsCount){
+    this->connections = new WeightedConnection[_connectionsCount];
+    for (int i = 0; i < _connectionsCount; i++)
+    {
+        this->connections[i].neuron = &_inputNeurons[i];
+        this->connections[i].weight = _weights[i];
+    }
+}
 
 Neuron::Neuron(const Neuron & _neuron):activation(_neuron.activation), bias(_neuron.bias), connectionsCount(_neuron.connectionsCount){
     this->connections = new WeightedConnection[_neuron.connectionsCount];
@@ -175,6 +184,27 @@ NeuralNetwork::NeuralNetwork(const NeuralNetwork & _neuralNetwork):layers(_neura
     }
 }
 
+
+int NeuralNetwork::GetLayersAmount(){
+    return this->layers;
+}
+
+int* NeuralNetwork::GetLayerSizes(){
+    int * out = new int[layers];
+    for (int i = 0; i < layers; i++) {
+        out[i] = layerSizes[i];
+    }
+    return out;
+}
+
+int NeuralNetwork::GetInputsAmount(){
+    return layerSizes[0];
+}
+
+int NeuralNetwork::GetOutputsAmount(){
+    return layerSizes[layers-1];
+}
+
 void NeuralNetwork::RandomizeLayerWeights(const int & layerId){
     if (layerId == 0) return;
     for (int i = 0; i < layerSizes[layerId]; i++){
@@ -240,7 +270,7 @@ void NeuralNetwork::EvaluateNetwork(const int & _count, float* _inputs){
     EvaluateNetwork();
 }
 
-float* NeuralNetwork::GetDecision(){
+float* NeuralNetwork::GetOutputs(){
     float* out = new float[layerSizes[layers-1]];
     for (int i = 0; i < layerSizes[layers-1]; i++){
         out[i] = neurons[layers-1][i].GetActivation();
@@ -248,15 +278,76 @@ float* NeuralNetwork::GetDecision(){
     return out;
 }
 
-float* NeuralNetwork::EvaluateGetDecision(){
+float* NeuralNetwork::EvaluateGetOutputs(){
+    EvaluateNetwork();
+    return GetOutputs();
+}
+
+float* NeuralNetwork::EvaluateGetOutputs(const int & _count, float* _inputs){
+    SetInputs(_count, _inputs);
+    EvaluateNetwork();
+    return GetOutputs();
+}
+
+int NeuralNetwork::GetDecision(){
+    int out = 0;
+    float _max = 0.0;
+    for (int i = 0; i < layerSizes[layers-1]; i++){
+        float _activation = neurons[layers-1][i].GetActivation();
+        if (_activation > _max) {
+            _max = _activation;
+            out = i;
+        }
+    }
+    return out;
+}
+
+int NeuralNetwork::EvaluateGetDecision(){
     EvaluateNetwork();
     return GetDecision();
 }
 
-float* NeuralNetwork::EvaluateGetDecision(const int & _count, float* _inputs){
+int NeuralNetwork::EvaluateGetDecision(const int & _count, float* _inputs){
     SetInputs(_count, _inputs);
     EvaluateNetwork();
     return GetDecision();
+}
+
+int* NeuralNetwork::GetSortedDecisions(){
+    // prepare data for sorting
+    int siz = GetOutputsAmount();
+    float* activations = GetOutputs();
+    int* out = new int[siz];
+    for (int i = 0; i < siz; i++){
+        out[i] = i;
+    }
+
+    // bubble sort
+    for (int j = 0; j < siz; j++){
+        for (int i = 0; i < siz - j - 1; i++){
+            if (activations[i] < activations[i+1]){
+                float p = activations[i];
+                activations[i] = activations[i+1];
+                activations[i+1] = p;
+                int d = out[i];
+                out[i] = out[i+1];
+                out[i+1] = d;
+            }
+        }
+    }
+
+    return out;
+}
+
+int* NeuralNetwork::EvaluateGetSortedDecisions(){
+    EvaluateNetwork();
+    return GetSortedDecisions();
+}
+
+int* NeuralNetwork::EvaluateGetSortedDecisions(const int & _count, float* _inputs){
+    SetInputs(_count, _inputs);
+    EvaluateNetwork();
+    return GetSortedDecisions();
 }
 
 void NeuralNetwork::PrintInfo(){
@@ -295,12 +386,16 @@ void NeuralNetworkTest(){
     int layerSiz[3] = {3, 3, 3};
     NeuralNetwork nn(layers, layerSiz);
     nn.RandomizeNetwork();
+
+    NeuralNetwork nn2 = nn;
+    nn.RandomizeNetwork();
     
     float inputs[3] = {0.3, 0.8, 0.1};
     nn.EvaluateNetwork(layers, inputs);
     nn.PrintInfo();
 
-    NeuralNetwork nn2 = nn;
+    nn2.EvaluateNetwork(layers, inputs);
     nn2.PrintInfo();
+
     printf("Test finished");
 }

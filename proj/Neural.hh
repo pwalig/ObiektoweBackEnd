@@ -20,6 +20,7 @@ class Neuron{
     public:
     Neuron();
     Neuron(const int & _connectionsCount, Neuron* _inputNeurons);
+    Neuron(const int & _connectionsCount, Neuron* _inputNeurons, float* _weights);
     Neuron(const Neuron & _neuron);
     void CreateConnections(const int & _connectionsCount, Neuron* _inputNeurons);
     void CreateConnections(const int & _connectionsCount, Neuron* _inputNeurons, float* _weights);
@@ -63,6 +64,11 @@ class NeuralNetwork {
     NeuralNetwork(const int & _layers, int* _layerSizes);
     NeuralNetwork(const NeuralNetwork & _neuralNetwork);
 
+    int GetLayersAmount();
+    int* GetLayerSizes();
+    int GetInputsAmount();
+    int GetOutputsAmount();
+
     void RandomizeLayerWeights(const int & layerId);
     void RandomizeLayerBiases(const int & layerId);
     void RandomizeLayer(const int & layerId);
@@ -74,9 +80,15 @@ class NeuralNetwork {
     void EvaluateLayer(const int & layerId);
     void EvaluateNetwork();
     void EvaluateNetwork(const int & _count, float* _inputs);
-    float* GetDecision();
-    float* EvaluateGetDecision();
-    float* EvaluateGetDecision(const int & _count, float* _inputs);
+    float* GetOutputs();
+    float* EvaluateGetOutputs();
+    float* EvaluateGetOutputs(const int & _count, float* _inputs);
+    int GetDecision();
+    int EvaluateGetDecision();
+    int EvaluateGetDecision(const int & _count, float* _inputs);
+    int* GetSortedDecisions();
+    int* EvaluateGetSortedDecisions();
+    int* EvaluateGetSortedDecisions(const int & _count, float* _inputs);
 
     void PrintInfo();
 
