@@ -9,7 +9,7 @@ float FastSigmoid(const float & x){
     return 0.5 * (x / (1 + std::abs(x))) + 0.5;
 }
 
-float RanodmFloat(const float & _min, const float & _max){
+float RandomFloat(const float & _min, const float & _max){
     if (_min == _max) return _min;
     return _min + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(_max-_min)));
 }
@@ -17,7 +17,7 @@ float RanodmFloat(const float & _min, const float & _max){
 float* RandomList(const int & _size, const float & _min, const float & _max){
     float* out = new float [_size];
     for (int i = 0; i < _size; i++){
-        out[i] = RanodmFloat(_min, _max);
+        out[i] = RandomFloat(_min, _max);
     }
     return out;
 }
@@ -101,6 +101,12 @@ void Neuron::SetWeights(const int & _size, float* _weights){
     }
 }
 
+void Neuron::VaryWeights(const int & _size, float* _weightVariances){
+    for (int i = 0; i < connectionsCount && i <_size; i++){
+        this->connections[i].weight += _weightVariances[i];
+    }
+}
+
 float* Neuron::GetWeights(){
     float* out = new float[this->connectionsCount];
     for (int i = 0; i < connectionsCount; i++){
@@ -178,8 +184,8 @@ NeuralNetwork::NeuralNetwork(const NeuralNetwork & _neuralNetwork):layers(_neura
         if (i==0) continue;
         for (int j = 0; j < _neuralNetwork.layerSizes[i]; j++){
             float* _weights = _neuralNetwork.neurons[i][j].GetWeights();
-            this->neurons[i][j].SetBias(_neuralNetwork.neurons[i][j].GetBias());
-            this->neurons[i][j].SetActivation(_neuralNetwork.neurons[i][j].GetActivation());
+            this->neurons[i][j].bias = _neuralNetwork.neurons[i][j].bias;
+            this->neurons[i][j].activation = _neuralNetwork.neurons[i][j].activation;
             this->neurons[i][j].CreateConnections(this->layerSizes[i-1], this->neurons[i-1], _weights);
             delete [] _weights;
         }
@@ -207,45 +213,201 @@ int NeuralNetwork::GetOutputsAmount(){
     return layerSizes[layers-1];
 }
 
-void NeuralNetwork::RandomizeLayerWeights(const int & layerId){
+void NeuralNetwork::RandomizeLayerWeights(const int & layerId, const float & _weightVariance){
     if (layerId == 0) return;
     for (int i = 0; i < layerSizes[layerId]; i++){
-        float* _weights = RandomList(layerSizes[layerId-1], -5.0, 5.0);
+        float* _weights = RandomList(layerSizes[layerId-1], -_weightVariance, _weightVariance);
         neurons[layerId][i].SetWeights(layerSizes[layerId-1], _weights);
         delete [] _weights;
     }
 }
-void NeuralNetwork::RandomizeLayerBiases(const int & layerId){
+void NeuralNetwork::RandomizeLayerBiases(const int & layerId, const float & _biasVariance){
     if (layerId == 0) return;
     for (int i = 0; i < layerSizes[layerId]; i++){
-        float _bias = RanodmFloat(-10.0, 10.0);
+        float _bias = RandomFloat(-_biasVariance, _biasVariance);
         neurons[layerId][i].SetBias(_bias);
     }
 }
-void NeuralNetwork::RandomizeLayer(const int & layerId){
+void NeuralNetwork::RandomizeLayer(const int & layerId, const float & _weightVariance, const float & _biasVariance){
     if (layerId == 0) return;
     for (int i = 0; i < layerSizes[layerId]; i++){
-        float* _weights = RandomList(layerSizes[layerId-1], -5.0, 5.0);
+        float* _weights = RandomList(layerSizes[layerId-1], -_biasVariance, _biasVariance);
         neurons[layerId][i].SetWeights(layerSizes[layerId-1], _weights);
         delete [] _weights;
-        float _bias = RanodmFloat(-10.0, 10.0);
+        float _bias = RandomFloat(-_weightVariance, _weightVariance);
         neurons[layerId][i].SetBias(_bias);
     }
 }
-void NeuralNetwork::RandomizeNetworkWeights(){
+void NeuralNetwork::RandomizeNetworkWeights(const float & _weightVariance){
     for (int i = 1; i < layers; i++){
-        RandomizeLayerWeights(i);
+        RandomizeLayerWeights(i, _weightVariance);
     }
 }
-void NeuralNetwork::RandomizeNetworkBiases(){
+void NeuralNetwork::RandomizeNetworkBiases(const float & _biasVariance){
     for (int i = 1; i < layers; i++){
-        RandomizeLayerBiases(i);
+        RandomizeLayerBiases(i, _biasVariance);
     }
 }
-void NeuralNetwork::RandomizeNetwork(){
+void NeuralNetwork::RandomizeNetwork(const float & _weightVariance, const float & _biasVariance){
     for (int i = 1; i < layers; i++){
-        RandomizeLayer(i);
+        RandomizeLayer(i, _weightVariance, _biasVariance);
     }
+}
+
+void NeuralNetwork::VaryLayerWeights(const int & layerId, const float & _weightVariance){
+    if (layerId == 0) return;
+    for (int i = 0; i < layerSizes[layerId]; i++){
+        float* _weights = RandomList(layerSizes[layerId-1], -_weightVariance, _weightVariance);
+        neurons[layerId][i].VaryWeights(layerSizes[layerId-1], _weights);
+        delete [] _weights;
+    }
+}
+void NeuralNetwork::VaryLayerBiases(const int & layerId, const float & _biasVariance){
+    if (layerId == 0) return;
+    for (int i = 0; i < layerSizes[layerId]; i++){
+        float _bias = RandomFloat(-_biasVariance, _biasVariance);
+        neurons[layerId][i].bias += _bias;
+    }
+}
+void NeuralNetwork::VaryLayer(const int & layerId, const float & _weightVariance, const float & _biasVariance){
+    if (layerId == 0) return;
+    for (int i = 0; i < layerSizes[layerId]; i++){
+        float* _weights = RandomList(layerSizes[layerId-1], -_biasVariance, _biasVariance);
+        neurons[layerId][i].VaryWeights(layerSizes[layerId-1], _weights);
+        delete [] _weights;
+        float _bias = RandomFloat(-_weightVariance, _weightVariance);
+        neurons[layerId][i].bias += _bias;
+    }
+}
+void NeuralNetwork::VaryNetworkWeights(const float & _weightVariance){
+    for (int i = 1; i < layers; i++){
+        VaryLayerWeights(i, _weightVariance);
+    }
+}
+void NeuralNetwork::VaryNetworkBiases(const float & _biasVariance){
+    for (int i = 1; i < layers; i++){
+        VaryLayerBiases(i, _biasVariance);
+    }
+}
+void NeuralNetwork::VaryNetwork(const float & _weightVariance, const float & _biasVariance){
+    for (int i = 1; i < layers; i++){
+        VaryLayer(i, _weightVariance, _biasVariance);
+    }
+}
+
+NeuralNetwork NeuralNetwork::Breed(const int & _parentsCount, NeuralNetwork* _parents, float* _parentInfluences, const float & variance) {
+    if (_parentsCount == 0) return NeuralNetwork(); // if no parents return empty network
+    if (_parentsCount == 1) return _parents[0]; // if only one parent -> child should be identical
+    NeuralNetwork child(_parents[0]);
+    for (int i = 1; i < child.layers; i++){
+        for (int j = 0; j < child.layerSizes[i]; j++){
+            // prepare values
+            float* _weights = new float[child.layerSizes[i-1]];
+            float* _weightSums = new float[child.layerSizes[i-1]];
+            for (int l = 0; l < child.layerSizes[i-1]; l++) _weights[l] = 0.0;
+            for (int l = 0; l < child.layerSizes[i-1]; l++) _weightSums[l] = 0.0;
+            float _bias = 0;
+            float _biasSum = 0.0;
+
+            for (int k = 0; k < _parentsCount; k++){
+                float* _weights2 = _parents[k].neurons[i][j].GetWeights();
+                float _bias2 = _parents[k].neurons[i][j].GetBias();
+
+                if (variance <= 0.0){ // average breed
+                    for (int l = 0; l < child.layerSizes[i-1]; l++){
+                        _weights[l] += _weights2[l] * _parentInfluences[k];
+                        _weightSums[l] += _parentInfluences[k];
+                    }
+                    _bias += _bias2 * _parentInfluences[k];
+                    _biasSum += _parentInfluences[k];
+                }
+
+                else if (variance <= 1.0){ // interpolate breed
+                    for (int l = 0; l < child.layerSizes[i-1]; l++){
+                        float rf = RandomFloat(1.0 - variance, 1.0) * _parentInfluences[k];
+                        _weights[l] += _weights2[l] * rf;
+                        _weightSums[l] += rf;
+                    }
+                    float rf = RandomFloat(1.0 - variance, 1.0) * _parentInfluences[k];
+                    _bias += _bias2 * rf;
+                    _biasSum += rf;
+                }
+
+                else { // binary breed
+                    for (int l = 0; l < child.layerSizes[i-1]; l++){
+                        float rf = RandomFloat(0.0, 1.0);
+                        if (rf < 1.0 - _parentInfluences[k]) rf /= variance;
+                        else rf = 1.0 - ((1.0 - rf) / variance);
+                        _weights[l] += _weights2[l] * rf;
+                        _weightSums[l] += rf;
+                    }
+
+                    float rf = RandomFloat(0.0, 1.0);
+                    if (rf < 1.0 - _parentInfluences[k]) rf /= variance;
+                    else rf = 1.0 - ((1.0 - rf) / variance);
+                    _bias += _bias2 * rf;
+                    _biasSum += rf;
+                }
+
+                // prevent near 0 weight and bias sums, to avoid rounding errors
+                if (_biasSum < 1.0) _biasSum = 0.5 + (0.5 * _biasSum * _biasSum);
+                for (int l = 0; l < child.layerSizes[i-1]; l++) {
+                    if (_weightSums[l] < 1.0) _weightSums[l] = 0.5 + (0.5 * _weightSums[l] * _weightSums[l]);
+                }
+            }
+
+            // assign new values
+            for (int l = 0; l < child.layerSizes[i-1]; l++) _weights[l] /= _weightSums[i];
+            child.neurons[i][j].SetWeights(child.layerSizes[i-1], _weights);
+            child.neurons[i][j].bias = _bias / _biasSum;
+            delete [] _weights;
+            delete [] _weightSums;
+        }
+    }
+    return child;
+}
+
+
+NeuralNetwork NeuralNetwork::BinaryBreed(const int & _parentsCount, NeuralNetwork* _parents, float* _parentInfluences){
+    if (_parentsCount == 0) return NeuralNetwork(); // if no parents return empty network
+    if (_parentsCount == 1) return _parents[0]; // if only one parent -> child should be identical
+    NeuralNetwork child(_parents[0]);
+
+    float chanceSum = 0.0;
+    for (int i = 0; i < _parentsCount; i++) chanceSum += _parentInfluences[i];
+
+    for (int i = 1; i < child.layers; i++){
+        for (int j = 0; j < child.layerSizes[i]; j++){
+            // breed weights
+            float* _weights = new float[child.layerSizes[i-1]];
+            for (int l = 0; l < child.layerSizes[i-1]; l++) {
+                // get random parent
+                float rf = RandomFloat(0.0, chanceSum);
+                int pId = 0;
+                float chanceSum2 = _parentInfluences[pId];
+                while (chanceSum2 < rf && pId < _parentsCount) {
+                    pId++;
+                    chanceSum2 += _parentInfluences[pId];
+                }
+                _weights[l] = _parents[pId].neurons[i][j].connections[l].weight; // assign random parent's weight to weight list for it's child
+            }
+            // assign new child's weights
+            child.neurons[i][j].SetWeights(child.layerSizes[i-1], _weights);
+            delete [] _weights;
+
+            //breed bias
+            // get random parent
+            float rf = RandomFloat(0.0, chanceSum);
+            int pId = 0;
+            float chanceSum2 = _parentInfluences[pId];
+            while (chanceSum2 < rf && pId < _parentsCount) {
+                pId++;
+                chanceSum2 += _parentInfluences[pId];
+            }
+            child.neurons[i][j].bias = _parents[pId].neurons[i][j].GetBias(); // assign random parent's bias to it's child
+        }
+    }
+    return child;
 }
 
 void NeuralNetwork::SetInputs(const int & _count, float* _inputs){
@@ -319,7 +481,7 @@ int* NeuralNetwork::GetSortedDecisions(){
     // prepare data for sorting
     int siz = GetOutputsAmount();
     float* activations = GetOutputs();
-    int* out = new int[siz];
+    int* out = new int[siz]; // array of decision id's
     for (int i = 0; i < siz; i++){
         out[i] = i;
     }
@@ -371,36 +533,4 @@ NeuralNetwork::~NeuralNetwork(){
     }
     delete [] this->neurons;
     delete [] this->layerSizes;
-}
-
-// TESTS
-
-void NeuronTest(){
-    printf("Running Neuron Test:\n");
-    Neuron n;
-    n.SetBias(15);
-    n.PrintInfo(true);
-
-    Neuron n2 = n;
-    n2.PrintInfo(true);
-}
-
-void NeuralNetworkTest(){
-    printf("Running NeuralNetwork Test:\n");
-    int layers = 3;
-    int layerSiz[3] = {3, 3, 3};
-    NeuralNetwork nn(layers, layerSiz);
-    nn.RandomizeNetwork();
-
-    NeuralNetwork nn2 = nn;
-    nn.RandomizeNetwork();
-    
-    float inputs[3] = {0.3, 0.8, 0.1};
-    nn.EvaluateNetwork(layers, inputs);
-    nn.PrintInfo(false, true, true);
-
-    nn2.EvaluateNetwork(layers, inputs);
-    nn2.PrintInfo(false, true, true);
-
-    printf("Test finished");
 }

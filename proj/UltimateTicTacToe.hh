@@ -71,7 +71,7 @@ class UltimateTicTacToe : public Game {
     // 1 - player 1 mark
     char marks [2];
     
-    float* GetBoardState();
+    float* GetBoardState(const int & _playerId);
 
     public:
     //Creating TicTacToe game with no players can cause errors.
@@ -92,10 +92,3 @@ class UltimateTicTacToe : public Game {
 
     virtual void Play();
 };
-
-
-
-// TESTS
-
-void BoardTest();
-void UltimateTicTacToeTest();

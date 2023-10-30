@@ -26,24 +26,3 @@ int AiModel::GetDecision(const int & _inputSize, float * _inputs, const int & re
     }
     return requestNo;
 }
-
-void AiModelTest(){
-    int layers = 3;
-    int layerSiz[3] = {3, 3, 5};
-    AiModel am(layers, layerSiz);
-    am.GetNeuralNetwork()->RandomizeNetwork();
-    
-    float inputs[3] = {0.3, 0.8, 0.1};
-    int dec = am.GetDecision(layers, inputs, 0);
-    am.GetNeuralNetwork()->PrintInfo(false, true, true);
-
-    printf("Decision no 1: %d\n", dec);
-    dec = am.GetDecision(layers, inputs, 1);
-    printf("Decision no 2: %d\n", dec);
-    dec = am.GetDecision(layers, inputs, 2);
-    printf("Decision no 3: %d\n", dec);
-    dec = am.GetDecision(layers, inputs, 3);
-    printf("Decision no 4: %d\n", dec);
-    dec = am.GetDecision(layers, inputs, 4);
-    printf("Decision no 5: %d\n", dec);
-}

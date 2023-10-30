@@ -1,7 +1,7 @@
 #pragma once
 
 float FastSigmoid(const float & x);
-float RanodmFloat(const float & _min, const float & _max);
+float RandomFloat(const float & _min, const float & _max);
 float* RandomList(const int & _size, const float & _min, const float & _max);
 
 class Neuron{
@@ -32,11 +32,15 @@ class Neuron{
     void SetBias(const float & _bias);
     float* GetWeights();
     void SetWeights(const int & _size, float* _weights);
+    void VaryWeights(const int & _size, float* _weightVariances);
+
     float EvaluateActivation();
 
     void PrintInfo(const bool & _weights);
 
     ~Neuron();
+
+    friend class NeuralNetwork;
 };
 
 // OBSOLETE, LACKS FULL IMPLEMENTATION
@@ -69,12 +73,22 @@ class NeuralNetwork {
     int GetInputsAmount();
     int GetOutputsAmount();
 
-    void RandomizeLayerWeights(const int & layerId);
-    void RandomizeLayerBiases(const int & layerId);
-    void RandomizeLayer(const int & layerId);
-    void RandomizeNetworkWeights();
-    void RandomizeNetworkBiases();
-    void RandomizeNetwork();
+    void RandomizeLayerWeights(const int & layerId, const float & _weightVariance);
+    void RandomizeLayerBiases(const int & layerId, const float & _biasVariance);
+    void RandomizeLayer(const int & layerId, const float & _weightVariance, const float & _biasVariance);
+    void RandomizeNetworkWeights(const float & _weightVariance);
+    void RandomizeNetworkBiases(const float & _biasVariance);
+    void RandomizeNetwork(const float & _weightVariance, const float & _biasVariance);
+
+    void VaryLayerWeights(const int & layerId, const float & _weightVariance);
+    void VaryLayerBiases(const int & layerId, const float & _biasVariance);
+    void VaryLayer(const int & layerId, const float & _weightVariance, const float & _biasVariance);
+    void VaryNetworkWeights(const float & _weightVariance);
+    void VaryNetworkBiases(const float & _biasVariance);
+    void VaryNetwork(const float & _weightVariance, const float & _biasVariance);
+
+    static NeuralNetwork Breed(const int & _parentsCount, NeuralNetwork* _parents, float* _parentInfluences, const float & variance);
+    static NeuralNetwork BinaryBreed(const int & _parentsCount, NeuralNetwork* _parents, float* _parentInfluences);
 
     void SetInputs(const int & _count, float* _inputs);
     void EvaluateLayer(const int & layerId);
@@ -94,8 +108,3 @@ class NeuralNetwork {
 
     ~NeuralNetwork();
 };
-
-// TESTS
-
-void NeuronTest();
-void NeuralNetworkTest();

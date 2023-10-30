@@ -13,5 +13,3 @@ class AiModel : public Player {
     NeuralNetwork* GetNeuralNetwork();
     virtual int GetDecision(const int & _inputSize, float * _inputs, const int & requestNo);
 };
-
-void AiModelTest();
