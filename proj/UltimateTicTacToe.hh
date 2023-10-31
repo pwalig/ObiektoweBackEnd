@@ -46,6 +46,7 @@ class UTTTBoard {
     public:
     UTTTBoard();
     bool IsFull();
+    bool Draw();
     void Reset();
     void Mark(const int & _board, const int & _field, const char & value);
     char GetWinner();
@@ -62,9 +63,18 @@ class UltimateTicTacToe : public Game {
     UTTTBoard board;
     int curBoard;
     
+    const static int requiredPlayersCount;
     const static int inputs;
     const static int outputs;
     bool display[2];
+    float scores[2];
+
+    float wrongMovePenalty;
+    float wonBoardReward;
+    float wonGameReward;
+    float lostGamePenalty;
+    
+    bool forceDisplay;
 
     // available marks:
     // 0 - player 0 mark
@@ -77,18 +87,24 @@ class UltimateTicTacToe : public Game {
     //Creating TicTacToe game with no players can cause errors.
     //Remember to add players before you call Play();
     UltimateTicTacToe();
-
     UltimateTicTacToe(const int & _amount, Player** _players);
+    
     virtual void SetPlayers(const int & _amount, Player** _players);
+    void SetForeDisplay(const bool & _disp);
+    void SetScoreParameters(const float & _wrongMovePenalty, const float & _wonBoardReward, const float & _wonGameReward, const float & _lostGamePenalty);
 
     // get the amount of different actions you can take in the Game
     static int GetInputs();
     // get the amount of variables on which game state can be written
     static int GetOutputs();
+    static int GetRequiredPlayersCount();
     // get the amount of different actions you can take in the Game
     virtual int GetInstanceInputs();
     // get the amount of variables on which game state can be written
     virtual int GetInstanceOutputs();
+    virtual int GetInstanceRequiredPlayersCount();
 
     virtual void Play();
+    virtual int GetWinner();
+    virtual float GetScore(const int & _playerId);
 };

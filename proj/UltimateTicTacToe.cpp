@@ -67,6 +67,18 @@ bool UTTTBoard::IsFull(){
     return true;
 }
 
+bool UTTTBoard::Draw(){
+    if (GetWinner() == EMPTY_MARK){
+        for (int i = 0; i < 9; i++){
+            if (!boards[i].IsFull()){
+                if (boards[i].GetWinner() == EMPTY_MARK) return false;
+            } 
+        }
+        return true;
+    }
+    return false;
+}
+
 void UTTTBoard::Reset(){
     for (int i = 0; i < 9; i++) {
         boards[i].Reset();
@@ -98,7 +110,8 @@ void UTTTBoard::Mark(const int & _board, const int & _field, const char & value)
 }
 
 TTTBoard UTTTBoard::GetBoardByIndex(const int & _id){
-    return boards[_id];
+    if (_id < 9 && _id >= 0) return boards[_id];
+    return boards[0];
 }
 
 void UTTTBoard::Render(){
@@ -135,47 +148,65 @@ void UTTTBoard::HelperBoard(const int & _curBoard){
 
 // ULTIMATE TIC TAC TOE
 
+const int UltimateTicTacToe::requiredPlayersCount = 2;
 const int UltimateTicTacToe::inputs = 9;
-const int UltimateTicTacToe::outputs = 172;
+const int UltimateTicTacToe::outputs = 91;
 
-UltimateTicTacToe::UltimateTicTacToe():Game(), curBoard(-1) {
+UltimateTicTacToe::UltimateTicTacToe():Game(), curBoard(-1), forceDisplay(false) {
     marks[0] = 'o';
     marks[1] = 'x';
     display[0] = true;
     display[1] = true;
+    scores[0] = 0.0;
+    scores[1] = 0.0;
 }
 
 
-UltimateTicTacToe::UltimateTicTacToe(const int & _amount, Player** _players):Game(_amount, _players, 9, 82), curBoard(-1){
+UltimateTicTacToe::UltimateTicTacToe(const int & _amount, Player** _players):Game(_amount, _players, 9, 82), curBoard(-1), forceDisplay(false){
     marks[0] = 'o';
     marks[1] = 'x';
     if (_amount > 0) display[0] = this->players[0]->requireDisplay;
     if (_amount > 1) display[1] = this->players[1]->requireDisplay;
+    scores[0] = 0.0;
+    scores[1] = 0.0;
 }
 
 void UltimateTicTacToe::SetPlayers(const int & _amount, Player** _players){
     this->Game::SetPlayers(_amount, _players);
     if (_amount > 0) display[0] = this->players[0]->requireDisplay;
     if (_amount > 1) display[1] = this->players[1]->requireDisplay;
+    scores[0] = 0.0;
+    scores[1] = 0.0;
+}
+
+
+void UltimateTicTacToe::SetForeDisplay(const bool & _disp){
+    this->forceDisplay = _disp;
+}
+void UltimateTicTacToe::SetScoreParameters(const float & _wrongMovePenalty, const float & _wonBoardReward, const float & _wonGameReward, const float & _lostGamePenalty){
+    this->wrongMovePenalty = _wrongMovePenalty;
+    this->wonBoardReward = _wonBoardReward;
+    this->wonGameReward = _wonGameReward;
+    this->lostGamePenalty = _lostGamePenalty;
 }
 
 float* UltimateTicTacToe::GetBoardState(const int & _playerId){
     float* out = new float[UltimateTicTacToe::outputs];
     for (int i = 0; i < 9; i++) {
         for (int j = 0; j < 9; j++){
-            // player mark
-            out[2*((i*9)+j)] = 0.0; // lack of player mark
-            if (board.boards[i].fields[j] == marks[_playerId]) out[2*((i*9)+j)] = 1.0; // player mark presence
-
             //opponent mark
-            out[2*((i*9)+j) + 1] = 1.0; // oponent mark presence
-            if (board.boards[i].fields[j] == EMPTY_MARK) out[2*((i*9)+j) + 1] = 0.0; // lack of oponent mark
+            out[(i*9)+j] = 0.5; // oponent mark presence
+            if (board.boards[i].fields[j] == EMPTY_MARK) out[(i*9)+j] = 0.0; // lack of oponent mark
+
+            // player mark
+            //out[(i*9)+j] = 0.0; // lack of player mark
+            if (board.boards[i].fields[j] == marks[_playerId]) out[(i*9)+j] = 1.0; // player mark presence
         }
     }
     for (int i = 0; i < 9; i++){
-        out[162+i] = ((curBoard == i) ? 1.0 : 0.0);
+        out[81+i] = ((curBoard == i) ? 1.0 : 0.0);
     }
-    out[171] = ((curBoard == -1) ? 1.0 : 0.0); // last variable informs weather the move is for choosing the board or field
+    out[90] = ((curBoard == -1) ? 1.0 : 0.0); // last variable informs weather the move is for choosing the board or field
     return out;
 }
 
@@ -183,10 +214,13 @@ float* UltimateTicTacToe::GetBoardState(const int & _playerId){
 int UltimateTicTacToe::GetInputs() {
     return UltimateTicTacToe::inputs;
 }
-
 // get the amount variables on which game state can be written
 int UltimateTicTacToe::GetOutputs() {
     return UltimateTicTacToe::outputs;
+}
+
+int UltimateTicTacToe::GetRequiredPlayersCount(){
+    return UltimateTicTacToe::requiredPlayersCount;
 }
 
 // get the amount of different actions you can take in the Game
@@ -198,14 +232,19 @@ int UltimateTicTacToe::GetInstanceOutputs(){
     return UltimateTicTacToe::outputs;
 }
 
+int UltimateTicTacToe::GetInstanceRequiredPlayersCount(){
+    return UltimateTicTacToe::requiredPlayersCount;
+}
+
 
 void UltimateTicTacToe::Play() {
     int choice;
     int curPlayer = 0;
+    curBoard = -1;
     board.Reset();
     while(true) {
         if (display[curPlayer]) printf("\n-----%c turn-----\n", marks[curPlayer]);
-        if (display[curPlayer]) {board.Render(); board.HelperBoard(curBoard);} //render board
+        if (display[curPlayer] || forceDisplay) {board.Render(); board.HelperBoard(curBoard);} //render board
 
         // board choice
         if (curBoard < 0) {
@@ -216,8 +255,9 @@ void UltimateTicTacToe::Play() {
                 choice = this->players[curPlayer]->GetDecision(UltimateTicTacToe::outputs, boardState, requestNo);
                 delete [] boardState;
                 requestNo++;
-            } while (this->board.GetBoardByIndex(choice).IsFull() || board.wins[choice] != EMPTY_MARK); // if chosen board is either won or full choose again
+            } while (choice >= 9 || choice < 0 || this->board.GetBoardByIndex(choice).IsFull() || board.wins[choice] != EMPTY_MARK); // if chosen board is either won or full choose again
             curBoard = choice;
+            scores[curPlayer] -= (requestNo - 1) * this->wrongMovePenalty;
         }
 
         int requestNo = 0;
@@ -228,12 +268,19 @@ void UltimateTicTacToe::Play() {
             choice = this->players[curPlayer]->GetDecision(UltimateTicTacToe::outputs, boardState, requestNo);
             delete [] boardState;
             requestNo++;
-        } while (this->board.GetBoardByIndex(curBoard).fields[choice] != EMPTY_MARK); // if chosen field is occupied choose again
+        } while (choice >= 9 || choice < 0 || this->board.GetBoardByIndex(curBoard).fields[choice] != EMPTY_MARK); // if chosen field is occupied choose again
+        scores[curPlayer] -= (requestNo - 1) * this->wrongMovePenalty;
 
         this->board.Mark(curBoard, choice, marks[curPlayer]); // set mark
+        if (this->board.GetBoardByIndex(curBoard).GetWinner() == marks[curPlayer]) scores[curPlayer] += wonBoardReward; // reward player of winning a singular board
 
-        if (board.GetWinner() == marks[curPlayer]) break; // check if that was a winning move
+        if (board.GetWinner() == marks[curPlayer]) { // check if that was a winning move
+            scores[curPlayer] += this->wonGameReward;
+            curPlayer == 0 ? scores[1] -= this->lostGamePenalty : scores[0] -= this->lostGamePenalty;
+            break;
+        }
         if (board.IsFull()) break;  // check if we filled the board
+        if (board.Draw()) break; // check if draw occured
 
         curBoard = choice; // where we play next
         if (this->board.GetBoardByIndex(curBoard).IsFull() || board.wins[curBoard] != EMPTY_MARK) curBoard = -1; // if new current board is filled or won already then allow next player to choose
@@ -242,5 +289,13 @@ void UltimateTicTacToe::Play() {
         if (curPlayer == 1) curPlayer = 0;
         else curPlayer = 1;
     }
-    if (display[0] || display[1]) {board.Render(); board.HelperBoard(curBoard);}
+    if (display[0] || display[1] || forceDisplay) {board.Render(); board.HelperBoard(curBoard);}
+}
+
+
+int UltimateTicTacToe::GetWinner(){
+    return board.GetWinner();
+}
+float UltimateTicTacToe::GetScore(const int & _playerId){
+    return scores[_playerId];
 }

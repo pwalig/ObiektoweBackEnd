@@ -17,6 +17,10 @@ Game::Game(const int & _amount, Player** _players, const int & _inputs, const in
     }
 }
 
+Game::~Game(){
+    if (this->players != nullptr) delete [] this->players;
+}
+
 // get the amount of different actions you can take in the Game
 int Game::GetInstanceInputs(){
     return 0;
@@ -27,10 +31,14 @@ int Game::GetInstanceOutputs(){
     return 0;
 }
 
+int Game::GetInstanceRequiredPlayersCount(){
+    return 0;
+}
+
 void Game::SetPlayers(const int & _amount, Player** _players){
-    if (players) delete [] players;
+    if (this->players != nullptr) delete [] players;
     this->playersCount = _amount;
-    players = new Player* [_amount];
+    this->players = new Player* [this->playersCount];
     for (int i = 0; i < _amount; i++) {
         this->players[i] = _players[i];
     }

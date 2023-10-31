@@ -17,13 +17,20 @@ class Neuron{
     };
     WeightedConnection* connections = nullptr;
 
+    void FreeExisting();
+
     public:
     Neuron();
     Neuron(const int & _connectionsCount, Neuron* _inputNeurons);
     Neuron(const int & _connectionsCount, Neuron* _inputNeurons, float* _weights);
     Neuron(const Neuron & _neuron);
-    void CreateConnections(const int & _connectionsCount, Neuron* _inputNeurons);
-    void CreateConnections(const int & _connectionsCount, Neuron* _inputNeurons, float* _weights);
+    Neuron(Neuron && _neuron);
+
+    Neuron& operator=(const Neuron& other);
+    Neuron& operator=(Neuron&& other);
+
+    void CreateNewConnections(const int & _connectionsCount, Neuron* _inputNeurons);
+    void CreateNewConnections(const int & _connectionsCount, Neuron* _inputNeurons, float* _weights);
 
     int GetConnectionsCount();
     float GetActivation();
@@ -32,11 +39,14 @@ class Neuron{
     void SetBias(const float & _bias);
     float* GetWeights();
     void SetWeights(const int & _size, float* _weights);
+    void SetNeurons(const int & _size, Neuron* _neurons);
+    void SetConnections(const int & _size, Neuron* _neurons, float* _weights);
+
     void VaryWeights(const int & _size, float* _weightVariances);
 
     float EvaluateActivation();
 
-    void PrintInfo(const bool & _weights);
+    void PrintInfo(const bool & _weights, const bool & _neuronAdresses);
 
     ~Neuron();
 
@@ -59,14 +69,22 @@ class NeuralLayer{
 
 class NeuralNetwork {
     private:
-    Neuron ** neurons = nullptr;
     int layers = 0;
     int * layerSizes = nullptr;
+    Neuron ** neurons = nullptr;
+
+    void FreeExisting();
 
     public:
     NeuralNetwork();
     NeuralNetwork(const int & _layers, int* _layerSizes);
-    NeuralNetwork(const NeuralNetwork & _neuralNetwork);
+    NeuralNetwork(const NeuralNetwork & other);
+    NeuralNetwork(NeuralNetwork && other);
+
+    NeuralNetwork& operator=(const NeuralNetwork& other);
+    NeuralNetwork& operator=(NeuralNetwork&& other);
+
+    void SetupNetwork(const int & _layers, int* _layerSizes);
 
     int GetLayersAmount();
     int* GetLayerSizes();
