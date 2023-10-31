@@ -171,6 +171,11 @@ UltimateTicTacToe::UltimateTicTacToe(const int & _amount, Player** _players):Gam
     scores[1] = 0.0;
 }
 
+Game* UltimateTicTacToe::returnCopy(){
+    UltimateTicTacToe* uttt = new UltimateTicTacToe(*this);
+    return uttt;
+}
+
 void UltimateTicTacToe::SetPlayers(const int & _amount, Player** _players){
     this->Game::SetPlayers(_amount, _players);
     if (_amount > 0) display[0] = this->players[0]->requireDisplay;

@@ -19,6 +19,8 @@ class Game {
     virtual int GetInstanceRequiredPlayersCount();
     virtual void SetPlayers(const int & _amount, Player** _players);
 
+    virtual Game* returnCopy();
+
     virtual void Play();
     virtual int GetWinner();
     virtual float GetScore(const int & _playerId);

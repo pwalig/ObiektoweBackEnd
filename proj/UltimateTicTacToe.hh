@@ -104,6 +104,8 @@ class UltimateTicTacToe : public Game {
     virtual int GetInstanceOutputs();
     virtual int GetInstanceRequiredPlayersCount();
 
+    virtual Game* returnCopy();
+
     virtual void Play();
     virtual int GetWinner();
     virtual float GetScore(const int & _playerId);

@@ -107,6 +107,7 @@ class NeuralNetwork {
 
     static NeuralNetwork Breed(const int & _parentsCount, NeuralNetwork* _parents, float* _parentInfluences, const float & variance);
     static NeuralNetwork BinaryBreed(const int & _parentsCount, NeuralNetwork* _parents, float* _parentInfluences);
+    static NeuralNetwork OneParentBreed(const int & _parentsCount, NeuralNetwork* _parents, float* _parentInfluences);
 
     void SetInputs(const int & _count, float* _inputs);
     void EvaluateLayer(const int & layerId);

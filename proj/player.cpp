@@ -1,5 +1,6 @@
 #include "player.hh"
 #include <stdio.h>
+#include "random"
 
 // PLAYER INTERFACE
 
@@ -33,4 +34,15 @@ int HumanPlayer::GetDecision(const int & _inputSize, float * inputs, const int &
     int out = 0;
     scanf("%d", &out);
     return out;
+}
+
+
+// RANDOM PLAYER
+
+RandomPlayer::RandomPlayer(){
+    this->requireDisplay = false;
+}
+
+int RandomPlayer::GetDecision(const int & _inputSize, float * _inputs, const int & requestNo){
+    return rand() % _inputSize;
 }

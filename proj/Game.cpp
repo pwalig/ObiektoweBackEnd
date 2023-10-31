@@ -44,6 +44,11 @@ void Game::SetPlayers(const int & _amount, Player** _players){
     }
 }
 
+Game* Game::returnCopy(){
+    Game* gg = new Game(*this);
+    return gg;
+}
+
 void Game::Play(){ }
 
 int Game::GetWinner(){

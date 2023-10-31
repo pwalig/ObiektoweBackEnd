@@ -555,6 +555,24 @@ NeuralNetwork NeuralNetwork::BinaryBreed(const int & _parentsCount, NeuralNetwor
     return child;
 }
 
+
+NeuralNetwork NeuralNetwork::OneParentBreed(const int & _parentsCount, NeuralNetwork* _parents, float* _parentInfluences){
+    if (_parentsCount == 0) return NeuralNetwork(); // if no parents return empty network
+    if (_parentsCount == 1) return _parents[0]; // if only one parent -> child should be identical
+
+    float chanceSum = 0.0;
+    for (int i = 0; i < _parentsCount; i++) chanceSum += _parentInfluences[i];
+    float rf = RandomFloat(0.0, chanceSum);
+    int pId = 0;
+    float chanceSum2 = _parentInfluences[pId];
+    while (chanceSum2 < rf && pId < _parentsCount) {
+        pId++;
+        chanceSum2 += _parentInfluences[pId];
+    }
+
+    return _parents[pId];
+}
+
 void NeuralNetwork::SetInputs(const int & _count, float* _inputs){
     for (int i = 0; i < _count && i < this->layerSizes[0]; i++) {
         float v = _inputs[i];
