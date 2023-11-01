@@ -13,6 +13,11 @@ float FastSigmoid(const float & x){
     return 0.5 * (x / (1 + std::abs(x))) + 0.5;
 }
 
+float ReLU(const float & x) {
+    if (x <= 0.0) return 0.0;
+    else return x;
+}
+
 float RandomFloat(const float & _min, const float & _max){
     if (_min == _max) return _min;
     return _min + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(_max-_min)));
@@ -201,7 +206,7 @@ float Neuron::EvaluateActivation(){
     }
     wSum += bias;
     //printf("total wsum + bias = %f\n", wSum);
-    wSum = FastSigmoid(wSum);
+    //wSum = FastSigmoid(wSum);
     //printf("after sigmoid: %f\n", wSum);
     this->activation = wSum;
     return this->activation;
@@ -360,8 +365,9 @@ int NeuralNetwork::GetOutputsAmount(){
 
 void NeuralNetwork::RandomizeLayerWeights(const int & layerId, const float & _weightVariance){
     if (layerId == 0) return;
+    float normalizedWariance = _weightVariance / layerSizes[layerId-1];
     for (int i = 0; i < layerSizes[layerId]; i++){
-        float* _weights = RandomList(layerSizes[layerId-1], -_weightVariance, _weightVariance);
+        float* _weights = RandomList(layerSizes[layerId-1], -normalizedWariance, normalizedWariance);
         neurons[layerId][i].SetWeights(layerSizes[layerId-1], _weights);
         delete [] _weights;
     }
@@ -375,8 +381,9 @@ void NeuralNetwork::RandomizeLayerBiases(const int & layerId, const float & _bia
 }
 void NeuralNetwork::RandomizeLayer(const int & layerId, const float & _weightVariance, const float & _biasVariance){
     if (layerId == 0) return;
+    float normalizedWariance = _weightVariance / layerSizes[layerId-1];
     for (int i = 0; i < layerSizes[layerId]; i++){
-        float* _weights = RandomList(layerSizes[layerId-1], -_weightVariance, _weightVariance);
+        float* _weights = RandomList(layerSizes[layerId-1], -normalizedWariance, normalizedWariance);
         neurons[layerId][i].SetWeights(layerSizes[layerId-1], _weights);
         delete [] _weights;
         float _bias = RandomFloat(-_biasVariance, _biasVariance);
@@ -401,8 +408,9 @@ void NeuralNetwork::RandomizeNetwork(const float & _weightVariance, const float 
 
 void NeuralNetwork::VaryLayerWeights(const int & layerId, const float & _weightVariance){
     if (layerId == 0) return;
+    float normalizedWariance = _weightVariance / layerSizes[layerId-1];
     for (int i = 0; i < layerSizes[layerId]; i++){
-        float* _weights = RandomList(layerSizes[layerId-1], -_weightVariance, _weightVariance);
+        float* _weights = RandomList(layerSizes[layerId-1], -normalizedWariance, normalizedWariance);
         neurons[layerId][i].VaryWeights(layerSizes[layerId-1], _weights);
         delete [] _weights;
     }
@@ -416,11 +424,12 @@ void NeuralNetwork::VaryLayerBiases(const int & layerId, const float & _biasVari
 }
 void NeuralNetwork::VaryLayer(const int & layerId, const float & _weightVariance, const float & _biasVariance){
     if (layerId == 0) return;
+    float normalizedWariance = _weightVariance / layerSizes[layerId-1];
     for (int i = 0; i < layerSizes[layerId]; i++){
-        float* _weights = RandomList(layerSizes[layerId-1], -_biasVariance, _biasVariance);
+        float* _weights = RandomList(layerSizes[layerId-1], -normalizedWariance, normalizedWariance);
         neurons[layerId][i].VaryWeights(layerSizes[layerId-1], _weights);
         delete [] _weights;
-        float _bias = RandomFloat(-_weightVariance, _weightVariance);
+        float _bias = RandomFloat(-_biasVariance, _biasVariance);
         neurons[layerId][i].bias += _bias;
     }
 }
@@ -691,7 +700,7 @@ void NeuralNetwork::PrintInfo(const bool & _skipInputLayer, const bool & _neuron
 }
 
 
-void NeuralNetwork::SaveNetwork(const char * filename){
+void NeuralNetwork::SaveNetwork(const std::string & filename){
     std::ofstream file(filename);
 
     file << this->layers << std::endl;
@@ -714,7 +723,7 @@ void NeuralNetwork::SaveNetwork(const char * filename){
     file.close();
 }
 
-void NeuralNetwork::SaveNetwork(const NeuralNetwork & nn, const char * filename){
+void NeuralNetwork::SaveNetwork(const NeuralNetwork & nn, const std::string & filename){
     std::ofstream file(filename);
 
     file << nn.layers << std::endl;
@@ -737,7 +746,7 @@ void NeuralNetwork::SaveNetwork(const NeuralNetwork & nn, const char * filename)
     file.close();
 }
 
-NeuralNetwork NeuralNetwork::ReadNetwork(const char * filename){
+NeuralNetwork NeuralNetwork::ReadNetwork(const std::string & filename){
     std::ifstream file(filename);
 
     int layers;

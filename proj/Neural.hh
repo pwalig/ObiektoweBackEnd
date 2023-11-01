@@ -1,6 +1,8 @@
 #pragma once
+#include <string>
 
 float FastSigmoid(const float & x);
+float ReLU(const float & x);
 float RandomFloat(const float & _min, const float & _max);
 float* RandomList(const int & _size, const float & _min, const float & _max);
 
@@ -125,9 +127,9 @@ class NeuralNetwork {
 
     void PrintInfo(const bool & _skipInputLayer, const bool & _neurons, const bool & _weights);
 
-    void SaveNetwork(const char * filename);
-    static void SaveNetwork(const NeuralNetwork & nn, const char * filename);
-    static NeuralNetwork ReadNetwork(const char * filename);
+    void SaveNetwork(const std::string & filename);
+    static void SaveNetwork(const NeuralNetwork & nn, const std::string & filename);
+    static NeuralNetwork ReadNetwork(const std::string & filename);
 
     ~NeuralNetwork();
 };

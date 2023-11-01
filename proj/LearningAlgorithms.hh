@@ -38,10 +38,11 @@ class LearningAlgorithm {
 
 class UTTTLearning {
     private:
-    static void RunGeneration(const int & siz, NeuralNetwork* generation, float * scores, const int & gamesByOneModel, const int & every, const int & start);
+    static void RunGeneration(const int & siz, NeuralNetwork* generation, float * scores, const int & randomSuplementation, const bool & playSelf, const int & every, const int & start);
     static void BreedGeneration(const int & siz, NeuralNetwork* generation, float * scores, const int & method, const int & every, const int & start);
 
     public:
     static NeuralNetwork TeachModel(const int & generationSize, const int & subGenerations, const int & generationLimit);
+    static NeuralNetwork BeatPredecessors(const int & generationLimit, const int & triesLimit);
 };
 

@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <thread>
 
+#include <string>
 
 LearningAlgorithm::LearningAlgorithm():game(nullptr), generationSize(0), hiddenLayersCount(0), hiddenLayerSizes(nullptr){}
 
@@ -36,7 +37,7 @@ NeuralNetwork* LearningAlgorithm::CreateGeneration(const int & generationSize, c
 void LearningAlgorithm::RunSubGeneration(const int & siz, NeuralNetwork* generation, float * privScores, const int & gamesByOneModel){
     int playersInGame = game->GetInstanceRequiredPlayersCount();
     UltimateTicTacToe newGame;
-    newGame.SetScoreParameters(0.0, 0.0, 1.0, 1.0);
+    newGame.SetScoreParameters(0.0, 0.0, 0.1, 0.1, 1.0, 1.0);
 
     for (int j = 0; j < siz; j++) { // for each model
         //printf("model %d in part %d\n", &generation[j], generation);
@@ -150,11 +151,16 @@ NeuralNetwork LearningAlgorithm::TeachModel(const int & generationLimit, const i
 float LearningAlgorithm::TestAgainst(Game & game, const NeuralNetwork & nn, Player * _player, const int & _repetitions){
     float score = 0.0;
     AiModel ai(nn);
-    for (int i = 0; i < _repetitions; i++){
+    for (int i = 0; i < _repetitions / 2; i++){
         Player* playerList[2] = {&ai, _player};
         game.SetPlayers(2, playerList);
         game.Play(); // play the game
         score += game.GetScore(0);
+
+        Player* playerList2[2] = {_player, &ai};
+        game.SetPlayers(2, playerList2);
+        game.Play(); // play the game
+        score += game.GetScore(1);
     }
     return score / _repetitions;
 }
@@ -166,10 +172,10 @@ LearningAlgorithm::~LearningAlgorithm() {
 
 /// ULTIMATE TIC TAC TOE
 
-void UTTTLearning::RunGeneration(const int & siz, NeuralNetwork* generation, float * scores, const int & randomSuplementation, const int & every, const int & start){
+void UTTTLearning::RunGeneration(const int & siz, NeuralNetwork* generation, float * scores, const int & randomSuplementation, const bool & playSelf, const int & every, const int & start){
     int playersInGame = 2;
     UltimateTicTacToe newGame;
-    newGame.SetScoreParameters(0.001, 0.1, 1.0, 1.0);
+    newGame.SetScoreParameters(0.0, 0.01, 0.1, 0.1, 1.0, 1.0);
 
     for (int j = start; j < siz; j += every) { // for each model
         //printf("model %d in part %d\n", &generation[j], generation);
@@ -178,7 +184,7 @@ void UTTTLearning::RunGeneration(const int & siz, NeuralNetwork* generation, flo
         AiModel* ap = new AiModel(generation[j]);
         players[0] = ap;
 
-        for (int l = start; l < siz; l += every) { // play against every model in generation
+        for (int l = start; playSelf && (l < siz); l += every) { // play against every model in generation
             if (j != l) {
                 AiModel* op = new AiModel(generation[l]);
                 players[1] = op;
@@ -190,12 +196,20 @@ void UTTTLearning::RunGeneration(const int & siz, NeuralNetwork* generation, flo
             }
         }
 
-        for (int l = 0; l < randomSuplementation; l++) { // play against random player
+        for (int l = 0; l < randomSuplementation / 2; l++) { // play against random player
             RandomPlayer* rp = new RandomPlayer();
             players[1] = rp;
             newGame.SetPlayers(playersInGame, players);
             newGame.Play(); // play the game
             scores[j] += newGame.GetScore(0);
+
+            players[0] = rp;
+            players[1] = ap;
+            newGame.SetPlayers(playersInGame, players);
+            newGame.Play(); // play the game
+            scores[j] += newGame.GetScore(1);
+
+            players[0] = ap;
             delete rp;
         }
 
@@ -205,8 +219,8 @@ void UTTTLearning::RunGeneration(const int & siz, NeuralNetwork* generation, flo
 }
 
 NeuralNetwork UTTTLearning::TeachModel(const int & generationSize, const int & subGenerations, const int & generationLimit) {
-    int layerSizes[4] = {UltimateTicTacToe::GetOutputs(), 16, 16, UltimateTicTacToe::GetInputs()};
-    NeuralNetwork* generation = LearningAlgorithm::CreateGeneration(generationSize, 4, layerSizes, 5.0, 10.0);
+    int layerSizes[4] = {UltimateTicTacToe::GetOutputs(), 5, 5, UltimateTicTacToe::GetInputs()};
+    NeuralNetwork* generation = LearningAlgorithm::CreateGeneration(generationSize, 4, layerSizes, 8.0, 0.2);
 
     for (int i = 0; i < generationLimit; i++) { // for each generation
         printf("running gen %d\n", i);
@@ -215,6 +229,7 @@ NeuralNetwork UTTTLearning::TeachModel(const int & generationSize, const int & s
         for (int i = 0; i < generationSize; i++) scores[i] = 0.0;
 
         int randomSuplementation = 50;
+        bool playSelf = false;
 
         int sg = subGenerations;
         if (sg < 1) sg = 1;
@@ -223,14 +238,14 @@ NeuralNetwork UTTTLearning::TeachModel(const int & generationSize, const int & s
         printf("playing ");
         //std::thread subGenThread0(&LearningAlgorithm::RunSubGeneration, this, generationSize, generation, scores, gamesByOneModel);
         //subGenThread0.join();
-        std::thread runThread1(UTTTLearning::RunGeneration, (sg > 0 ? generationSize : 0), generation, scores, randomSuplementation, sg, 0);
-        std::thread runThread2(UTTTLearning::RunGeneration, (sg > 1 ? generationSize : 0), generation, scores, randomSuplementation, sg, 1);
-        std::thread runThread3(UTTTLearning::RunGeneration, (sg > 2 ? generationSize : 0), generation, scores, randomSuplementation, sg, 2);
-        std::thread runThread4(UTTTLearning::RunGeneration, (sg > 3 ? generationSize : 0), generation, scores, randomSuplementation, sg, 3);
-        std::thread runThread5(UTTTLearning::RunGeneration, (sg > 4 ? generationSize : 0), generation, scores, randomSuplementation, sg, 4);
-        std::thread runThread6(UTTTLearning::RunGeneration, (sg > 5 ? generationSize : 0), generation, scores, randomSuplementation, sg, 5);
-        std::thread runThread7(UTTTLearning::RunGeneration, (sg > 6 ? generationSize : 0), generation, scores, randomSuplementation, sg, 6);
-        std::thread runThread8(UTTTLearning::RunGeneration, (sg > 7 ? generationSize : 0), generation, scores, randomSuplementation, sg, 7);
+        std::thread runThread1(UTTTLearning::RunGeneration, (sg > 0 ? generationSize : 0), generation, scores, randomSuplementation, playSelf, sg, 0);
+        std::thread runThread2(UTTTLearning::RunGeneration, (sg > 1 ? generationSize : 0), generation, scores, randomSuplementation, playSelf, sg, 1);
+        std::thread runThread3(UTTTLearning::RunGeneration, (sg > 2 ? generationSize : 0), generation, scores, randomSuplementation, playSelf, sg, 2);
+        std::thread runThread4(UTTTLearning::RunGeneration, (sg > 3 ? generationSize : 0), generation, scores, randomSuplementation, playSelf, sg, 3);
+        std::thread runThread5(UTTTLearning::RunGeneration, (sg > 4 ? generationSize : 0), generation, scores, randomSuplementation, playSelf, sg, 4);
+        std::thread runThread6(UTTTLearning::RunGeneration, (sg > 5 ? generationSize : 0), generation, scores, randomSuplementation, playSelf, sg, 5);
+        std::thread runThread7(UTTTLearning::RunGeneration, (sg > 6 ? generationSize : 0), generation, scores, randomSuplementation, playSelf, sg, 6);
+        std::thread runThread8(UTTTLearning::RunGeneration, (sg > 7 ? generationSize : 0), generation, scores, randomSuplementation, playSelf, sg, 7);
 
         runThread1.join();
         runThread2.join();
@@ -246,6 +261,17 @@ NeuralNetwork UTTTLearning::TeachModel(const int & generationSize, const int & s
         QuickSortStructuresByKey<NeuralNetwork, float>(generationSize, generation, scores, false);
         printf("done\nbest score: %f\nmedian score: %f\nworst score: %f\n", scores[0], scores[generationSize/2], scores[generationSize-1]);
 
+        UltimateTicTacToe uttt;
+        uttt.SetScoreParameters(0.0, 0.01, 0.1, 0.1, 1.0, 1.0);
+        RandomPlayer rp;
+        printf("winner against random: %f \n", LearningAlgorithm::TestAgainst(uttt, generation[0], &rp, 100));
+        printf("median against random: %f \n", LearningAlgorithm::TestAgainst(uttt, generation[generationSize/2], &rp, 100));
+        printf("loser against random: %f \n", LearningAlgorithm::TestAgainst(uttt, generation[generationSize-1], &rp, 100));
+        Player np;
+        printf("winner against naive: %f \n", LearningAlgorithm::TestAgainst(uttt, generation[0], &np, 2));
+        printf("median against naive: %f \n", LearningAlgorithm::TestAgainst(uttt, generation[generationSize/2], &np, 2));
+        printf("loser against naive: %f \n", LearningAlgorithm::TestAgainst(uttt, generation[generationSize-1], &np, 2));
+
         printf("normalizing scores ");
         float maxscor = scores[0];
         if (maxscor <= 0.0){
@@ -260,17 +286,11 @@ NeuralNetwork UTTTLearning::TeachModel(const int & generationSize, const int & s
         }
         printf("done\n");
 
-        UltimateTicTacToe uttt;
-        uttt.SetScoreParameters(0.001, 0.1, 1.0, 1.0);
-        RandomPlayer rp;
-        printf("winner against random: %f \n", LearningAlgorithm::TestAgainst(uttt, generation[0], &rp, 50));
-        printf("loser against random: %f \n", LearningAlgorithm::TestAgainst(uttt, generation[generationSize-1], &rp, 50));
-
         printf("breeding ");
-        std::thread breedThread1(UTTTLearning::BreedGeneration, generationSize, generation, scores, 4, 4, 0);
-        std::thread breedThread2(UTTTLearning::BreedGeneration, generationSize, generation, scores, 1, 4, 1);
-        std::thread breedThread3(UTTTLearning::BreedGeneration, generationSize, generation, scores, 4, 4, 2);
-        std::thread breedThread4(UTTTLearning::BreedGeneration, generationSize, generation, scores, 0, 4, 3);
+        std::thread breedThread1(UTTTLearning::BreedGeneration, generationSize, generation, scores, 5, 4, 0);
+        std::thread breedThread2(UTTTLearning::BreedGeneration, generationSize, generation, scores, 5, 4, 1);
+        std::thread breedThread3(UTTTLearning::BreedGeneration, generationSize, generation, scores, 5, 4, 2);
+        std::thread breedThread4(UTTTLearning::BreedGeneration, generationSize, generation, scores, 5, 4, 3);
 
         breedThread1.join();
         breedThread2.join();
@@ -279,6 +299,10 @@ NeuralNetwork UTTTLearning::TeachModel(const int & generationSize, const int & s
         printf(" done\n");
 
         delete [] scores;
+        std::string filename = "UTTTLearning/Evolutionary/GenW";
+        filename.append(std::to_string(i));
+        filename.append(".txt");
+        NeuralNetwork::SaveNetwork(generation[0], filename);
     }
     NeuralNetwork winner = generation[0];
     delete [] generation;
@@ -288,12 +312,90 @@ NeuralNetwork UTTTLearning::TeachModel(const int & generationSize, const int & s
 
 void UTTTLearning::BreedGeneration(const int & siz, NeuralNetwork* generation, float * scores, const int & method, const int & every, const int & start){
     for (int i = (siz / 2) + start; i < siz; i += every) {
-        if (method == 0) generation[i].RandomizeNetwork(5.0, 10.0);
+        if (method == 0) generation[i].RandomizeNetwork(1.0, 0.1);
         if (method == 1) generation[i] = NeuralNetwork::Breed(siz / 2, generation, scores, 0.0);
         if (method == 2) generation[i] = NeuralNetwork::Breed(siz / 2, generation, scores, 1.0);
         if (method == 3) generation[i] = NeuralNetwork::BinaryBreed(siz / 2, generation, scores);
         if (method == 4) generation[i] = NeuralNetwork::OneParentBreed(siz / 2, generation, scores);
-        generation[i].VaryNetwork(0.2, 0.4);
+        if (method == 5) generation[i] = generation[i - (siz / 2)];
+        generation[i].VaryNetwork(0.1, 0.01);
         printf(".");
     }
+}
+
+
+NeuralNetwork UTTTLearning::BeatPredecessors(const int & generationLimit, const int & triesLimit){
+    UltimateTicTacToe newGame;
+    newGame.SetScoreParameters(0.00001, 0.001, 0.1, 0.1, 1.0, 1.0);
+    Player** players = new Player*[2];
+
+    NeuralNetwork* generations = new NeuralNetwork[generationLimit];
+    int layerSizes[2] = {UltimateTicTacToe::GetOutputs(), UltimateTicTacToe::GetInputs()};
+    generations[0].SetupNetwork(2, layerSizes);
+    generations[0].RandomizeNetwork(0.1, 0.0);
+
+    int tries = 0;
+    int maxi = 1;
+    printf("Running ");
+    for (int i = 1; i < generationLimit; i++){
+        if (i==maxi) {
+            printf("gen %d ", i);
+            tries = 0;
+        }
+        else i--;
+        
+        if(tries % (100 * i) == 0) printf(".");
+
+        generations[i] = generations[i-1];
+        //double factor = (((double)tries) / 100000.0) + 1.0;
+        if (tries > triesLimit) {
+            printf("tries limit exceded\n");
+            return generations[i-1];
+        }
+        generations[i].VaryNetwork(0.5, 0.001);
+
+        bool loss = false;
+        AiModel* tested = new AiModel(generations[i]);
+        for (int j = 0; j < i; j++)
+        {
+            AiModel* op = new AiModel(generations[j]);
+            players[0] = tested;
+            players[1] = op;
+            newGame.SetPlayers(2, players);
+            newGame.Play(); // play the game
+            if (newGame.GetScore(0) <= newGame.GetScore(1)) {
+                loss = true;
+                tries++;
+                delete op;
+                break;
+            }
+
+            players[1] = tested;
+            players[0] = op;
+            newGame.SetPlayers(2, players);
+            newGame.Play(); // play the game
+            if (newGame.GetScore(0) >= newGame.GetScore(1)) {
+                loss = true;
+                tries++;
+                delete op;
+                break;
+            }
+
+            delete op;
+        }
+        delete tested;
+        
+        if (!loss){
+            maxi++;
+            std::string filename = "UTTTLearning/BeatPredec/Gen";
+            filename.append(std::to_string(i));
+            filename.append(".txt");
+            NeuralNetwork::SaveNetwork(generations[i], filename);
+            printf("\n");
+        }
+    }
+    delete [] players;
+    NeuralNetwork winner = generations[generationLimit-1];
+    delete [] generations;
+    return winner;
 }

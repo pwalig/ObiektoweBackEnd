@@ -70,7 +70,9 @@ class UltimateTicTacToe : public Game {
     float scores[2];
 
     float wrongMovePenalty;
+    float giveBoardChoicePenalty;
     float wonBoardReward;
+    float lostBoardPenalty;
     float wonGameReward;
     float lostGamePenalty;
     
@@ -82,6 +84,7 @@ class UltimateTicTacToe : public Game {
     char marks [2];
     
     float* GetBoardState(const int & _playerId);
+    float* GetCompressedBoardState(const int & _playerId);
 
     public:
     //Creating TicTacToe game with no players can cause errors.
@@ -91,7 +94,7 @@ class UltimateTicTacToe : public Game {
     
     virtual void SetPlayers(const int & _amount, Player** _players);
     void SetForeDisplay(const bool & _disp);
-    void SetScoreParameters(const float & _wrongMovePenalty, const float & _wonBoardReward, const float & _wonGameReward, const float & _lostGamePenalty);
+    void SetScoreParameters(const float & _wrongMovePenalty, const float & _giveBoardChoicePenalty, const float & _wonBoardReward, const float & _lostBoardPenalty, const float & _wonGameReward, const float & _lostGamePenalty);
 
     // get the amount of different actions you can take in the Game
     static int GetInputs();
