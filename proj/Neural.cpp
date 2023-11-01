@@ -4,6 +4,9 @@
 #include <cmath>
 #include <stdio.h>
 
+#include <iostream>
+#include <fstream>
+
 // UTILS
 
 float FastSigmoid(const float & x){
@@ -685,4 +688,80 @@ void NeuralNetwork::PrintInfo(const bool & _skipInputLayer, const bool & _neuron
             }
         }
     }
+}
+
+
+void NeuralNetwork::SaveNetwork(const char * filename){
+    std::ofstream file(filename);
+
+    file << this->layers << std::endl;
+
+    for (int i = 0; i < this->layers; i++) {
+        file << this->layerSizes[i] << ' ';
+    }
+    file << std::endl;
+
+    for (int i = 1; i < this->layers; i++) {
+        for (int j = 0; j < this->layerSizes[i]; j++) {
+            file << this->neurons[i][j].bias << ' ';
+            for (int k = 0; k < this->neurons[i][j].connectionsCount; k++) {
+                file << this->neurons[i][j].connections[k].weight << ' ';
+            }
+            file << std::endl;
+        }
+    }
+
+    file.close();
+}
+
+void NeuralNetwork::SaveNetwork(const NeuralNetwork & nn, const char * filename){
+    std::ofstream file(filename);
+
+    file << nn.layers << std::endl;
+
+    for (int i = 0; i < nn.layers; i++) {
+        file << nn.layerSizes[i] << ' ';
+    }
+    file << std::endl;
+
+    for (int i = 1; i < nn.layers; i++) {
+        for (int j = 0; j < nn.layerSizes[i]; j++) {
+            file << nn.neurons[i][j].bias << ' ';
+            for (int k = 0; k < nn.neurons[i][j].connectionsCount; k++) {
+                file << nn.neurons[i][j].connections[k].weight << ' ';
+            }
+            file << std::endl;
+        }
+    }
+
+    file.close();
+}
+
+NeuralNetwork NeuralNetwork::ReadNetwork(const char * filename){
+    std::ifstream file(filename);
+
+    int layers;
+    file >> layers;
+
+    int* layerSizes = new int[layers];
+    for (int i = 0; i < layers; i++) {
+        file >> layerSizes[i];
+    }
+
+    NeuralNetwork out(layers, layerSizes);
+    delete [] layerSizes;
+
+    for (int i = 1; i < out.layers; i++) {
+        for (int j = 0; j < out.layerSizes[i]; j++) {
+            file >> out.neurons[i][j].bias;
+            out.neurons[i][j].CreateNewConnections(out.layerSizes[i-1], out.neurons[i-1]);
+            for (int k = 0; k < out.neurons[i][j].connectionsCount; k++) {
+                file >> out.neurons[i][j].connections[k].weight;
+            }
+        }
+    }
+
+    file.close();
+
+    return out;
 }

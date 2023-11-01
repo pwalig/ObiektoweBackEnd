@@ -125,5 +125,9 @@ class NeuralNetwork {
 
     void PrintInfo(const bool & _skipInputLayer, const bool & _neurons, const bool & _weights);
 
+    void SaveNetwork(const char * filename);
+    static void SaveNetwork(const NeuralNetwork & nn, const char * filename);
+    static NeuralNetwork ReadNetwork(const char * filename);
+
     ~NeuralNetwork();
 };

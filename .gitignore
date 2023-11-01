@@ -1,5 +1,5 @@
-builds/
-.vscode/
-proj/.vscode
+*
+!proj/*.cpp
+!proj/*.hh
 proj/test_main.cpp
 proj/test_main.exe

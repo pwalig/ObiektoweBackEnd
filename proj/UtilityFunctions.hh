@@ -1,10 +1,27 @@
 #pragma once
 
+#include <cmath>
+
 template <typename T>
 void CustomSwap(T & a, T & b){
     T p = a;
     a = b;
     b = p;
+}
+
+template  <typename T>
+T RandomT(const T & _min, const T & _max){
+    if (_min == _max) return _min;
+    return _min + static_cast <T> (rand()) /( static_cast <T> (RAND_MAX/(_max-_min)));
+}
+
+template  <typename T>
+T* RandomTList(const int & _size, const T & _min, const T & _max){
+    T* out = new T [_size];
+    for (int i = 0; i < _size; i++){
+        out[i] = RandomFloat(_min, _max);
+    }
+    return out;
 }
 
 template  <typename T, typename U>

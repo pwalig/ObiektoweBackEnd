@@ -169,7 +169,7 @@ LearningAlgorithm::~LearningAlgorithm() {
 void UTTTLearning::RunGeneration(const int & siz, NeuralNetwork* generation, float * scores, const int & randomSuplementation, const int & every, const int & start){
     int playersInGame = 2;
     UltimateTicTacToe newGame;
-    newGame.SetScoreParameters(0.01, 0.0, 0.0, 0.0);
+    newGame.SetScoreParameters(0.001, 0.1, 1.0, 1.0);
 
     for (int j = start; j < siz; j += every) { // for each model
         //printf("model %d in part %d\n", &generation[j], generation);
@@ -178,7 +178,7 @@ void UTTTLearning::RunGeneration(const int & siz, NeuralNetwork* generation, flo
         AiModel* ap = new AiModel(generation[j]);
         players[0] = ap;
 
-        /*for (int l = start; l < siz; l += every) { // play against every model in generation
+        for (int l = start; l < siz; l += every) { // play against every model in generation
             if (j != l) {
                 AiModel* op = new AiModel(generation[l]);
                 players[1] = op;
@@ -188,7 +188,7 @@ void UTTTLearning::RunGeneration(const int & siz, NeuralNetwork* generation, flo
                 scores[l] += newGame.GetScore(1);
                 delete op;
             }
-        }*/
+        }
 
         for (int l = 0; l < randomSuplementation; l++) { // play against random player
             RandomPlayer* rp = new RandomPlayer();
@@ -261,7 +261,7 @@ NeuralNetwork UTTTLearning::TeachModel(const int & generationSize, const int & s
         printf("done\n");
 
         UltimateTicTacToe uttt;
-        uttt.SetScoreParameters(0.01, 0.0, 0.0, 0.0);
+        uttt.SetScoreParameters(0.001, 0.1, 1.0, 1.0);
         RandomPlayer rp;
         printf("winner against random: %f \n", LearningAlgorithm::TestAgainst(uttt, generation[0], &rp, 50));
         printf("loser against random: %f \n", LearningAlgorithm::TestAgainst(uttt, generation[generationSize-1], &rp, 50));
