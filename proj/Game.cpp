@@ -1,4 +1,5 @@
 #include "Game.hh"
+#include <fstream>
 
 
 Game::Game():playersCount(0), players(nullptr){ }
@@ -81,7 +82,21 @@ void MainGame::Update()
 }
 
 void MainGame::ReadBoardState(const string & filename){
-
+    ifstream fin(filename);
+    int siz, player1NumOfBeings, player2NumOfBeings;
+    fin >> siz;
+    //the rest
+    for(int i=0; i<siz; i++)
+    {
+        vector<Being*> vct;
+        for(int j=0; j<siz; j++)
+        {
+            
+            vct.push_back(nullptr); 
+        }
+        this->board.fields.push_back(vct);
+    }
+    fin.close();
 }
 
 void MainGame::SaveBoardState(const string & filename){
