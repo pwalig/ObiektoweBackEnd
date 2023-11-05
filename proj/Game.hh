@@ -2,6 +2,7 @@
 #include "player.hh"
 #include "Being.hh"
 #include <vector>
+#include <string>
 
 using namespace std;
 
@@ -31,11 +32,25 @@ class Game {
 
 class Board{
     vector<vector<Being*>> fields;
+
     public:
-    void UpdateBoard();
+    Board(int siz);
+
+    void ReadBoardState(const string & filename);
+    void SaveBoardState(const string & filename);
+
+    friend class MainGame;
 };
 
 class MainGame{
     Board board;
+    vector<Being*> playerBeings[2];
+
+    public:
+    void AddBeing(const int & playerId, Being* being, const int & x, const int & y);
+    void ReadBoardState(const string & filename);
+    void SaveBoardState(const string & filename);
+    void Update();
+    ~MainGame();
 };
 

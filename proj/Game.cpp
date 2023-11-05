@@ -59,7 +59,7 @@ float Game::GetScore(const int & _playerId){
     return 0.0;
 }
 
-void Board::UpdateBoard()
+/*void Board::UpdateBoard()
 {
     int siz = this->fields.size();
     for(int i=0; i<siz; i++)
@@ -67,5 +67,34 @@ void Board::UpdateBoard()
         int siz_2 = this->fields[i].size();
         for(int j=0; j<siz_2; j++)
             this->fields[i][j]->Act();
+    }
+}*/
+
+
+void MainGame::Update()
+{
+    for(int i=0; i<2; i++) {
+        int siz_2 = this->playerBeings[i].size();
+        for(int j=0; j<siz_2; j++)
+            this->playerBeings[i][j]->Act();
+    }
+}
+
+void MainGame::ReadBoardState(const string & filename){
+
+}
+
+void MainGame::SaveBoardState(const string & filename){
+
+}
+
+MainGame::~MainGame(){
+    for(int i=0; i<2; i++) {
+        int siz_2 = this->playerBeings[i].size();
+        for(int j=0; j<siz_2; j++)
+        {
+            delete this->playerBeings[i][j];
+        }
+        this->playerBeings[i].clear();
     }
 }
