@@ -1,7 +1,6 @@
 #pragma once
 
 class Being{
-    int hp;
     public:
     virtual void Act();
 };
