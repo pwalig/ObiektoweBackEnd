@@ -58,3 +58,14 @@ int Game::GetWinner(){
 float Game::GetScore(const int & _playerId){
     return 0.0;
 }
+
+void Board::UpdateBoard()
+{
+    int siz = this->fields.size();
+    for(int i=0; i<siz; i++)
+    {
+        int siz_2 = this->fields[i].size();
+        for(int j=0; j<siz_2; j++)
+            this->fields[i][j]->Act();
+    }
+}

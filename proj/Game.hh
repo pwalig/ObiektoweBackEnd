@@ -1,6 +1,9 @@
 #pragma once
-
 #include "player.hh"
+#include "Being.hh"
+#include <vector>
+
+using namespace std;
 
 class Game {
     protected:
@@ -25,3 +28,14 @@ class Game {
     virtual int GetWinner();
     virtual float GetScore(const int & _playerId);
 };
+
+class Board{
+    vector<vector<Being*>> fields;
+    public:
+    void UpdateBoard();
+};
+
+class MainGame{
+    Board board;
+};
+
