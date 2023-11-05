@@ -83,7 +83,7 @@ void MainGame::Update()
 
 void MainGame::ReadBoardState(const string & filename){
     ifstream fin(filename);
-    int siz, player1NumOfBeings, player2NumOfBeings;
+    int siz;
     fin >> siz;
     //the rest
     for(int i=0; i<siz; i++)
