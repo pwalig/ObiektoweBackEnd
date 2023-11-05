@@ -18,7 +18,7 @@ class Neuron{
         Neuron* neuron = nullptr;
     };
     WeightedConnection* connections = nullptr;
-
+    
     void FreeExisting();
 
     public:
