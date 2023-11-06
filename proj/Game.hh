@@ -38,6 +38,9 @@ class Board{
 
     void ReadBoardState(const string & filename);
     void SaveBoardState(const string & filename);
+    int Move(int x1, int y1, int x2, int y2);
+    Being* GetBeing(int x, int y);
+    int SetBeing(Being* b, int x, int y);
 
     friend class MainGame;
 };
@@ -51,6 +54,8 @@ class MainGame{
     void ReadBoardState(const string & filename);
     void SaveBoardState(const string & filename);
     void Update();
+    Board* GetBoard();
+    void Destroy(Being* being);
     ~MainGame();
 };
 

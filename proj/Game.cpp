@@ -71,6 +71,57 @@ float Game::GetScore(const int & _playerId){
     }
 }*/
 
+Board::Board(int _siz)
+{
+    for(int i=0; i<_siz; i++)
+    {
+        vector<Being*> vct;
+        for(int j=0; j<_siz; j++)
+        {
+            
+            vct.push_back(nullptr); 
+        }
+        this->fields.push_back(vct);
+    }
+}
+
+Being* Board::GetBeing(int x, int y)
+{
+    return this->fields[x][y];
+}
+
+int Board::Move(int x1, int x2, int y1, int y2)
+{
+    if(x1 < 0 || x1 >= this->fields.size())
+        return 1;
+    if(y1 < 0 || y1 >= this->fields[x1].size())
+        return 2;
+    if(x2 < 0 || x2 >= this->fields.size())
+        return 3;
+    if(y2 < 0 || y2 >= this->fields[x2].size())
+        return 4;
+    if(this->fields[x1][y1] == nullptr)
+        return 5;
+    if(this->fields[x2][y2] != nullptr)
+        return 6;
+    this->fields[x2][y2] = this->fields[x1][y1];
+    this->fields[x1][y1] = nullptr;
+    return 0;
+}
+
+int Board::SetBeing(Being* b, int x, int y)
+{
+    if(x < 0 || x >= this->fields.size())
+        return 1;
+    if(y < 0 || y >= this->fields[x].size())
+        return 2;
+    if(b == nullptr)
+        return 3;
+    if(this->fields[x][y] != nullptr)
+        return 4;
+    this->fields[x][y] = b;
+    return 0;
+}
 
 void MainGame::Update()
 {
@@ -83,19 +134,14 @@ void MainGame::Update()
 
 void MainGame::ReadBoardState(const string & filename){
     ifstream fin(filename);
-    int siz;
+    int siz, playerOneBeingCount, playerTwoBeingCount;
     fin >> siz;
-    //the rest
-    for(int i=0; i<siz; i++)
-    {
-        vector<Being*> vct;
-        for(int j=0; j<siz; j++)
-        {
-            
-            vct.push_back(nullptr); 
-        }
-        this->board.fields.push_back(vct);
-    }
+    this->board = siz;
+    fin >> playerOneBeingCount >> playerTwoBeingCount;
+    for(int i=0; i<playerOneBeingCount; i++)
+        playerBeings[0].push_back(Being::GetNewBeing(fin));
+    for(int i=0; i<playerOneBeingCount; i++)
+        playerBeings[1].push_back(Being::GetNewBeing(fin));
     fin.close();
 }
 
@@ -112,4 +158,16 @@ MainGame::~MainGame(){
         }
         this->playerBeings[i].clear();
     }
+}
+
+Board* MainGame::GetBoard()
+{
+    return &this->board;
+}
+
+void MainGame::Destroy(Being* being)
+{
+    int x = being->GetX();
+    int y = being->GetY();
+    this->board.fields[x][y] = nullptr;
 }
