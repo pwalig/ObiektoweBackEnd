@@ -4,43 +4,81 @@
 using namespace std;
 
 
-Being* Being::GetPointerFromStream(ifstream & _ifstream){
-    int t;
-    _ifstream >> t;
+// ----------Being Static Methods----------
+
+Being* GetNewBeing(string filename){
+    ifstream in;
+    in.open(filename);
+    Being* b = Being::GetNewBeing(in);
+    in.close();
+    return b;
+}
+
+Being* Being::GetNewBeing(ifstream & in){
+    char t;
+    in >> t;
     Being* b;
     switch (t)
     {
-    case 0:
+    case 'b':
         b = new Being();
         break;
         
-    case 1:
-        b = new BasicBeing();
+    case 't':
+        b = new TestBeing();
         break;
         
-    case 2:
+    case 'l':
         b = new Living();
         break;
     
     default:
+        b = new Being();
         break;
     }
-    b->Read(_ifstream);
+    b->Read(in);
     return b;
 }
+
+
+// ----------Being Common----------
+
+int Being::GetX(){
+    return this->x;
+}
+int Being::GetY(){
+    return this->y;
+}
+int Being::GetPriority(){
+    return this->priority;
+}
+void Being::SetGame(MainGame* mg){
+    this->game = mg;
+}
+
 
 
 // ----------Being----------
 
 void Being::Act() {}
 
-void Being::Read(ifstream & _ifstream) {
-    _ifstream >> x;
-    _ifstream >> y;
+void Being::Read(ifstream & in) {
+    in >> x;
+    in >> y;
+    in >> priority;
+}
+void Being::Write(ofstream & out, const bool & f) {
+    if (f) out << "b ";
+    out << x << " " << y << " " << priority;
+    if (f) out << endl;
+    else out << " ";
 }
 
-void Being::PrintInfo(){
-    cout << "x: " << this->x << ", y: " << this->y << endl;
+void Being::PrintInfo(const bool & f){
+    if (f) cout << "type: Being, ";
+    cout << "x: " << this->x << ", y: " << this->y << ", priority: " << this->priority;
+    if (f) cout << endl;
+    else cout << ", ";
 }
 
 
@@ -48,29 +86,49 @@ void Being::PrintInfo(){
 
 void Living::Act() {}
 
-void Living::Read(ifstream & _ifstream) {
-    this->Being::Read(_ifstream);
-    _ifstream >> hp;
+void Living::Read(ifstream & in) {
+    this->Being::Read(in);
+    in >> hp;
+}
+void Living::Write(ofstream & out, const bool & f) {
+    if (f) out << "l ";
+    this->Being::Write(out, false);
+    out << hp;
+    if (f) out << endl;
+    else out << " ";
 }
 
-void Living::PrintInfo() {
-    cout << "hp: " << this->hp << ", ";
-    this->Being::PrintInfo();
+void Living::PrintInfo(const bool & f) {
+    if (f) cout << "type: Living, ";
+    this->Being::PrintInfo(false);
+    cout << "hp: " << this->hp;
+    if (f) cout << endl;
+    else cout << ", ";
 }
 
 
-// ----------BasicBeing----------
+// ----------TestBeing----------
 
-void BasicBeing::Act() {
-    cout << "Basic Being!!!" << this-> value << endl;
+void TestBeing::Act() {
+    cout << "Basic Being!!! " << this-> value << endl;
 }
 
-void BasicBeing::Read(ifstream & _ifstream) {
-    this->Being::Read(_ifstream);
-    _ifstream >> value;
+void TestBeing::Read(ifstream & in) {
+    this->Being::Read(in);
+    in >> value;
+}
+void TestBeing::Write(ofstream & out, const bool & f) {
+    if (f) out << "t ";
+    this->Being::Write(out, false);
+    out << value;
+    if (f) out << endl;
+    else out << " ";
 }
 
-void BasicBeing::PrintInfo(){
-    cout << "value: " << this->value << ", ";
-    this->Being::PrintInfo();
+void TestBeing::PrintInfo(const bool & f){
+    if (f) cout << "type: TestBeing, ";
+    this->Being::PrintInfo(false);
+    cout << "value: " << this->value;
+    if (f) cout << endl;
+    else cout << ", ";
 }

@@ -1,39 +1,51 @@
 #pragma once
 
+
 #include <fstream>
+#include <string>
 using namespace std;
+
+class MainGame;
 
 class Being{
     protected:
     int x;
     int y;
-
-    virtual void Read(ifstream & _ifstream);
+    int priority;
+    MainGame* game;
 
     public:
+    int GetX();
+    int GetY();
+    int GetPriority();
+    void SetGame(MainGame* mg);
+
     virtual void Act();
-    virtual void PrintInfo();
+    virtual void Read(ifstream & in);
+    virtual void Write(ofstream & out, const bool & f = true);
+    virtual void PrintInfo(const bool & f = true);
     
-    static Being* GetPointerFromStream(ifstream & _ifstream);
+    static Being* GetNewBeing(ifstream & in);
+    static Being* GetNewBeing(string filename);
 };
 
 class Living : public Being{
     protected:
     int hp = 0;
-    virtual void Read(ifstream & _ifstream);
 
     public:
     virtual void Act();
-    virtual void PrintInfo();
+    virtual void Read(ifstream & in);
+    virtual void Write(ofstream & out, const bool & f = true);
+    virtual void PrintInfo(const bool & f = true);
 };
 
-class BasicBeing : public Being{
+class TestBeing : public Being{
     int value = 0;
-
-    protected:
-    virtual void Read(ifstream & _ifstream);
 
     public:
     virtual void Act();
-    virtual void PrintInfo();
+    virtual void Read(ifstream & in);
+    virtual void Write(ofstream & out, const bool & f = true);
+    virtual void PrintInfo(const bool & f = true);
 };
