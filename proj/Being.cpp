@@ -3,6 +3,10 @@
 
 using namespace std;
 
+#define BEING_CHAR 'b'
+#define HPBEING_CHAR 'h'
+#define TESTBEING_CHAR 't'
+
 
 // ----------Being Static Methods----------
 
@@ -20,16 +24,16 @@ Being* Being::GetNewBeing(ifstream & in){
     Being* b;
     switch (t)
     {
-    case 'b':
+    case BEING_CHAR:
         b = new Being();
         break;
         
-    case 't':
+    case TESTBEING_CHAR:
         b = new TestBeing();
         break;
         
-    case 'l':
-        b = new Living();
+    case HPBEING_CHAR:
+        b = new HPBeing();
         break;
     
     default:
@@ -68,7 +72,7 @@ void Being::Read(ifstream & in) {
     in >> priority;
 }
 void Being::Write(ofstream & out, const bool & f) {
-    if (f) out << "b ";
+    if (f) out << BEING_CHAR << " ";
     out << x << " " << y << " " << priority;
     if (f) out << endl;
     else out << " ";
@@ -82,24 +86,37 @@ void Being::PrintInfo(const bool & f){
 }
 
 
-// ----------Living----------
+// ----------HPBeing----------
 
-void Living::Act() {}
+void HPBeing::Act() {}
 
-void Living::Read(ifstream & in) {
+
+void HPBeing::DealDamage(const int & damage){
+    hp -= damage;
+    if (hp <= 0) this->game->Destroy(this);
+}
+
+int HPBeing::DealDamage(HPBeing* hpb, const int & damage){
+    hpb->hp -= damage;
+    int out = hpb->hp;
+    if (hpb->hp <= 0) hpb->game->Destroy(hpb);
+    return out;
+}
+
+void HPBeing::Read(ifstream & in) {
     this->Being::Read(in);
     in >> hp;
 }
-void Living::Write(ofstream & out, const bool & f) {
-    if (f) out << "l ";
+void HPBeing::Write(ofstream & out, const bool & f) {
+    if (f) out << HPBEING_CHAR << " ";
     this->Being::Write(out, false);
     out << hp;
     if (f) out << endl;
     else out << " ";
 }
 
-void Living::PrintInfo(const bool & f) {
-    if (f) cout << "type: Living, ";
+void HPBeing::PrintInfo(const bool & f) {
+    if (f) cout << "type: HPBeing, ";
     this->Being::PrintInfo(false);
     cout << "hp: " << this->hp;
     if (f) cout << endl;
@@ -118,7 +135,7 @@ void TestBeing::Read(ifstream & in) {
     in >> value;
 }
 void TestBeing::Write(ofstream & out, const bool & f) {
-    if (f) out << "t ";
+    if (f) out << TESTBEING_CHAR << " ";
     this->Being::Write(out, false);
     out << value;
     if (f) out << endl;

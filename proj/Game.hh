@@ -1,5 +1,6 @@
 #pragma once
 #include "player.hh"
+class Being;
 #include "Being.hh"
 #include <vector>
 #include <string>

@@ -1,11 +1,12 @@
 #pragma once
 
-
 #include <fstream>
 #include <string>
-using namespace std;
 
 class MainGame;
+#include "Game.hh"
+
+using namespace std;
 
 class Being{
     protected:
@@ -21,6 +22,7 @@ class Being{
     void SetGame(MainGame* mg);
 
     virtual void Act();
+
     virtual void Read(ifstream & in);
     virtual void Write(ofstream & out, const bool & f = true);
     virtual void PrintInfo(const bool & f = true);
@@ -29,12 +31,23 @@ class Being{
     static Being* GetNewBeing(string filename);
 };
 
-class Living : public Being{
+class HPBeing : public Being{
     protected:
     int hp = 0;
 
     public:
     virtual void Act();
+
+    // Reduces Being's hp.
+    // Destroys it if hp goes below 0.
+    virtual void DealDamage(const int & damage);
+
+    // Reduces Being's hp.
+    // Destroys it if hp goes below 0.
+    // Returns remaining hp.
+    // Warning! returned value can be below 0, when damage exceeds remaining hp.
+    static int DealDamage(HPBeing* hpb, const int & damage);
+
     virtual void Read(ifstream & in);
     virtual void Write(ofstream & out, const bool & f = true);
     virtual void PrintInfo(const bool & f = true);
@@ -45,6 +58,7 @@ class TestBeing : public Being{
 
     public:
     virtual void Act();
+
     virtual void Read(ifstream & in);
     virtual void Write(ofstream & out, const bool & f = true);
     virtual void PrintInfo(const bool & f = true);
