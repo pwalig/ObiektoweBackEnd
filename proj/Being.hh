@@ -2,9 +2,10 @@
 
 #include <fstream>
 #include <string>
+#include <vector>
 
 class MainGame;
-#include "Game.hh"
+#include "MainGame.hh"
 
 using namespace std;
 
@@ -29,6 +30,8 @@ class Being{
     
     static Being* GetNewBeing(ifstream & in);
     static Being* GetNewBeing(string filename);
+    static int partitionBeingsByPriority(vector<Being*> & beings, const int & start, const int & end, const bool & ascendingOrder);
+    static void quickSortBeingsByPriority(vector<Being*> & beings, const int & start, const int & end, const bool & ascendingOrder);
 };
 
 class HPBeing : public Being{

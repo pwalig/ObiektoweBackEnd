@@ -44,6 +44,60 @@ Being* Being::GetNewBeing(ifstream & in){
     return b;
 }
 
+int Being::partitionBeingsByPriority(vector<Being*> & beings, const int & start, const int & end, const bool & ascendingOrder)
+{
+    int startPivot = (start + end) / 2;
+    int pivot = beings[startPivot]->GetPriority();
+ 
+    int count = 0;
+    for (int i = start; i <= end; i++) {
+        if (i != startPivot && ((beings[i]->GetPriority() <= pivot && ascendingOrder) || (beings[i]->GetPriority() > pivot && !ascendingOrder)))
+            count++;
+    }
+ 
+    // Giving pivot element its correct position
+    int pivotIndex = start + count;
+    swap(beings[pivotIndex], beings[startPivot]);
+ 
+    // Sorting left and right parts of the pivot element
+    int i = start, j = end;
+ 
+    while (i < pivotIndex && j > pivotIndex) {
+ 
+        while ((beings[i]->GetPriority() <= pivot && ascendingOrder) || (beings[i]->GetPriority() > pivot && !ascendingOrder)) {
+            i++;
+        }
+ 
+        while ((beings[j]->GetPriority() > pivot && ascendingOrder) || (beings[j]->GetPriority() <= pivot && !ascendingOrder)) {
+            j--;
+        }
+ 
+        if (i < pivotIndex && j > pivotIndex) {
+            swap(beings[i], beings[j]);
+            i++; j--;
+        }
+    }
+ 
+    return pivotIndex;
+}
+
+void Being::quickSortBeingsByPriority(vector<Being*> & beings, const int & start, const int & end, const bool & ascendingOrder)
+{
+ 
+    // base case
+    if (start >= end)
+        return;
+ 
+    // partitioning the array
+    int p = partitionBeingsByPriority(beings, start, end, ascendingOrder);
+ 
+    // Sorting the left part
+    quickSortBeingsByPriority(beings, start, p - 1, ascendingOrder);
+ 
+    // Sorting the right part
+    quickSortBeingsByPriority(beings, p + 1, end, ascendingOrder);
+}
+
 
 // ----------Being Common----------
 
