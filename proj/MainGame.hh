@@ -23,11 +23,17 @@ class Board{
     friend class MainGame;
 };
 
+// Does not have default constructor!
+// To construct object of this class use:
+// MainGame <object name> = "filename"
+// or
+// MainGame <object name>("filename")
 class MainGame{
     Board board;
-    vector<vector<Being*>> playerBeings; //playerBeings[player][being]
+    vector<vector<Being*>> playerBeings; // organisation: playerBeings[player][being]
 
-    void SortBeingsByPriotity(vector<Being*> & beings);
+    void SortBeingsByPriotity();
+    vector<Being*> GetCallQueue();
 
     public:
     MainGame(const string & filename);
@@ -39,6 +45,7 @@ class MainGame{
     void SaveBoardState(const string & filename);
 
     void Update();
+    void UpdateByPlayer();
     Board* GetBoard();
     void Destroy(Being* being);
 

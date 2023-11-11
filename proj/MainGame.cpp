@@ -100,12 +100,33 @@ void MainGame::SaveBoardState(const string & filename){
 
 }
 
-void MainGame::SortBeingsByPriotity(vector<Being*> & beings){
-    
+void MainGame::SortBeingsByPriotity(){
+    for (int i = 0; i < playerBeings.size(); i++)
+        Being::quickSortBeingsByPriority(playerBeings[i], 0, playerBeings[i].size() - 1, false);
 }
 
-void MainGame::Update()
-{
+vector<Being*> MainGame::GetCallQueue(){
+    vector<Being*> callQueue;
+    int playersCount = playerBeings.size();
+    for (int i = 0; i < playersCount; i++){
+        int pbsiz = playerBeings[i].size();
+        for (int j = 0; j < pbsiz; j++){
+            callQueue.push_back(playerBeings[i][j]);
+        }
+    }
+    Being::quickSortBeingsByPriority(callQueue, 0, callQueue.size() - 1, false);
+    return callQueue;
+}
+
+void MainGame::Update() {
+    vector<Being*> callQueue = GetCallQueue();
+    int siz = callQueue.size();
+    for(int i = 0; i < siz; i++)
+        callQueue[i]->Act();
+}
+
+void MainGame::UpdateByPlayer(){
+    SortBeingsByPriotity();
     int playersCount = playerBeings.size();
     for(int i=0; i < playersCount; i++) {
         int siz_2 = this->playerBeings[i].size();
