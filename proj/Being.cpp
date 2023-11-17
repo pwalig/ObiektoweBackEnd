@@ -1,7 +1,10 @@
 #include "Being.hh"
-#include <iostream>
+#include <fstream>
 
-using namespace std;
+using std::ifstream;
+using std::ofstream;
+using std::cout;
+using std::endl;
 
 #define BEING_CHAR 'b'
 #define HPBEING_CHAR 'h'
@@ -146,12 +149,12 @@ void HPBeing::Act() {}
 
 
 void HPBeing::DealDamage(const int & damage){
-    hp -= damage;
+    hp -= armour->CalculateNewDamage(damage);
     if (hp <= 0) this->game->Destroy(this);
 }
 
 int HPBeing::DealDamage(HPBeing* hpb, const int & damage){
-    hpb->hp -= damage;
+    hpb->hp -= hpb->armour->CalculateNewDamage(damage);
     int out = hpb->hp;
     if (hpb->hp <= 0) hpb->game->Destroy(hpb);
     return out;
@@ -160,11 +163,14 @@ int HPBeing::DealDamage(HPBeing* hpb, const int & damage){
 void HPBeing::Read(ifstream & in) {
     this->Being::Read(in);
     in >> hp;
+    armour = Armour::GetNewArmour(in);
 }
+
 void HPBeing::Write(ofstream & out, const bool & f) {
     if (f) out << HPBEING_CHAR << " ";
     this->Being::Write(out, false);
     out << hp;
+    armour->Write(out);
     if (f) out << endl;
     else out << " ";
 }
@@ -172,9 +178,14 @@ void HPBeing::Write(ofstream & out, const bool & f) {
 void HPBeing::PrintInfo(const bool & f) {
     if (f) cout << "type: HPBeing, ";
     this->Being::PrintInfo(false);
-    cout << "hp: " << this->hp;
+    cout << "hp: " << this->hp << ", ";
+    this->armour->PrintInfo();
     if (f) cout << endl;
     else cout << ", ";
+}
+
+HPBeing::~HPBeing(){
+    delete armour;
 }
 
 

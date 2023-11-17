@@ -1,13 +1,12 @@
 #pragma once
 
-#include <fstream>
+#include <iostream>
 #include <string>
 #include <vector>
 
 class MainGame;
 #include "MainGame.hh"
-
-using namespace std;
+#include "Armour.hh"
 
 class Being{
     protected:
@@ -24,24 +23,27 @@ class Being{
 
     virtual void Act();
 
-    virtual void Read(ifstream & in);
-    virtual void Write(ofstream & out, const bool & f = true);
+    // Required format:
+    // <type = 'b'> <x> <y> <priority>
+    virtual void Read(std::ifstream & in);
+    virtual void Write(std::ofstream & out, const bool & f = true);
     virtual void PrintInfo(const bool & f = true);
     
-    static Being* GetNewBeing(ifstream & in);
-    static Being* GetNewBeing(string filename);
-    static int partitionBeingsByPriority(vector<Being*> & beings, const int & start, const int & end, const bool & ascendingOrder);
-    static void quickSortBeingsByPriority(vector<Being*> & beings, const int & start, const int & end, const bool & ascendingOrder);
+    static Being* GetNewBeing(std::ifstream & in);
+    static Being* GetNewBeing(std::string filename);
+    static int partitionBeingsByPriority(std::vector<Being*> & beings, const int & start, const int & end, const bool & ascendingOrder);
+    static void quickSortBeingsByPriority(std::vector<Being*> & beings, const int & start, const int & end, const bool & ascendingOrder);
 };
 
 class HPBeing : public Being{
     protected:
     int hp = 0;
+    Armour* armour;
 
     public:
     virtual void Act();
 
-    // Reduces Being's hp.
+    // Reduces this Being's hp.
     // Destroys it if hp goes below 0.
     virtual void DealDamage(const int & damage);
 
@@ -51,9 +53,13 @@ class HPBeing : public Being{
     // Warning! returned value can be below 0, when damage exceeds remaining hp.
     static int DealDamage(HPBeing* hpb, const int & damage);
 
-    virtual void Read(ifstream & in);
-    virtual void Write(ofstream & out, const bool & f = true);
+    // Required format:
+    // <type = 'h'> <x> <y> <priority> <hp> <armour type> <armour parameters>
+    virtual void Read(std::ifstream & in);
+    virtual void Write(std::ofstream & out, const bool & f = true);
     virtual void PrintInfo(const bool & f = true);
+
+    ~HPBeing();
 };
 
 class TestBeing : public Being{
@@ -62,7 +68,9 @@ class TestBeing : public Being{
     public:
     virtual void Act();
 
-    virtual void Read(ifstream & in);
-    virtual void Write(ofstream & out, const bool & f = true);
+    // Required format:
+    // <type = 't'> <x> <y> <priority> <value>
+    virtual void Read(std::ifstream & in);
+    virtual void Write(std::ofstream & out, const bool & f = true);
     virtual void PrintInfo(const bool & f = true);
 };
