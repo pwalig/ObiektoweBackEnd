@@ -2,6 +2,12 @@
 #include <fstream>
 #include <iostream>
 
+using std::ifstream;
+using std::ofstream;
+using std::string;
+using std::vector;
+using std::cout;
+using std::endl;
 
 //----------Board----------
 
@@ -100,7 +106,7 @@ void MainGame::SaveBoardState(const string & filename){
 
 }
 
-void MainGame::SortBeingsByPriotity(){
+void MainGame::SortBeingsByPriority(){
     for (int i = 0; i < playerBeings.size(); i++)
         Being::quickSortBeingsByPriority(playerBeings[i], 0, playerBeings[i].size() - 1, false);
 }
@@ -126,7 +132,7 @@ void MainGame::Update() {
 }
 
 void MainGame::UpdateByPlayer(){
-    SortBeingsByPriotity();
+    SortBeingsByPriority();
     int playersCount = playerBeings.size();
     for(int i=0; i < playersCount; i++) {
         int siz_2 = this->playerBeings[i].size();

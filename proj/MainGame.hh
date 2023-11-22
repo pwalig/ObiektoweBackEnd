@@ -6,16 +6,14 @@
 class Being;
 #include "Being.hh"
 
-using namespace std;
-
 class Board{
-    vector<vector<Being*>> fields;
+    std::vector<std::vector<Being*>> fields;
 
     public:
     Board(const int & siz);
 
-    void ReadBoardState(const string & filename);
-    void SaveBoardState(const string & filename);
+    void ReadBoardState(const std::string & filename);
+    void SaveBoardState(const std::string & filename);
     int Move(const int & x1, const int & y1, const int & x2, const int & y2);
     Being* GetBeing(const int & x, const int & y);
     int SetBeing(Being* b, const int & x, const int & y);
@@ -25,24 +23,24 @@ class Board{
 
 // Does not have default constructor!
 // To construct object of this class use:
-// MainGame <object name> = "filename"
+// MainGame <object name> = "filename";
 // or
-// MainGame <object name>("filename")
+// MainGame <object name>("filename");
 class MainGame{
     Board board;
-    vector<vector<Being*>> playerBeings; // organisation: playerBeings[player][being]
+    std::vector<std::vector<Being*>> playerBeings; // organisation: playerBeings[player][being]
 
-    void SortBeingsByPriotity();
-    vector<Being*> GetCallQueue();
+    void SortBeingsByPriority();
+    std::vector<Being*> GetCallQueue();
 
     public:
-    MainGame(const string & filename);
+    MainGame(const std::string & filename);
     ~MainGame();
 
     void AddBeing(const int & playerId, Being* being, const int & x, const int & y);
 
-    void ReadBoardState(const string & filename);
-    void SaveBoardState(const string & filename);
+    void ReadBoardState(const std::string & filename);
+    void SaveBoardState(const std::string & filename);
 
     void Update();
     void UpdateByPlayer();

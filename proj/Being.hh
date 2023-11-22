@@ -26,7 +26,7 @@ class Being{
     // Required format:
     // <type = 'b'> <x> <y> <priority>
     virtual void Read(std::ifstream & in);
-    virtual void Write(std::ofstream & out, const bool & f = true);
+    virtual void Write(std::ofstream & out, const bool & f = true) const;
     virtual void PrintInfo(const bool & f = true);
     
     static Being* GetNewBeing(std::ifstream & in);
@@ -56,7 +56,7 @@ class HPBeing : public Being{
     // Required format:
     // <type = 'h'> <x> <y> <priority> <hp> <armour type> <armour parameters>
     virtual void Read(std::ifstream & in);
-    virtual void Write(std::ofstream & out, const bool & f = true);
+    virtual void Write(std::ofstream & out, const bool & f = true) const;
     virtual void PrintInfo(const bool & f = true);
 
     ~HPBeing();
@@ -71,6 +71,10 @@ class TestBeing : public Being{
     // Required format:
     // <type = 't'> <x> <y> <priority> <value>
     virtual void Read(std::ifstream & in);
-    virtual void Write(std::ofstream & out, const bool & f = true);
+    virtual void Write(std::ofstream & out, const bool & f = true) const;
     virtual void PrintInfo(const bool & f = true);
 };
+
+std::ifstream& operator >> (std::ifstream & is, Being & being);
+
+std::ofstream& operator << (std::ofstream & os, const Being & being);

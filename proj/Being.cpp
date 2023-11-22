@@ -3,6 +3,8 @@
 
 using std::ifstream;
 using std::ofstream;
+using std::string;
+using std::vector;
 using std::cout;
 using std::endl;
 
@@ -13,7 +15,7 @@ using std::endl;
 
 // ----------Being Static Methods----------
 
-Being* GetNewBeing(string filename){
+Being* Being::GetNewBeing(string filename){
     ifstream in;
     in.open(filename);
     Being* b = Being::GetNewBeing(in);
@@ -60,7 +62,7 @@ int Being::partitionBeingsByPriority(vector<Being*> & beings, const int & start,
  
     // Giving pivot element its correct position
     int pivotIndex = start + count;
-    swap(beings[pivotIndex], beings[startPivot]);
+    std::swap(beings[pivotIndex], beings[startPivot]);
  
     // Sorting left and right parts of the pivot element
     int i = start, j = end;
@@ -76,7 +78,7 @@ int Being::partitionBeingsByPriority(vector<Being*> & beings, const int & start,
         }
  
         if (i < pivotIndex && j > pivotIndex) {
-            swap(beings[i], beings[j]);
+            std::swap(beings[i], beings[j]);
             i++; j--;
         }
     }
@@ -128,7 +130,7 @@ void Being::Read(ifstream & in) {
     in >> y;
     in >> priority;
 }
-void Being::Write(ofstream & out, const bool & f) {
+void Being::Write(ofstream & out, const bool & f) const {
     if (f) out << BEING_CHAR << " ";
     out << x << " " << y << " " << priority;
     if (f) out << endl;
@@ -166,7 +168,7 @@ void HPBeing::Read(ifstream & in) {
     armour = Armour::GetNewArmour(in);
 }
 
-void HPBeing::Write(ofstream & out, const bool & f) {
+void HPBeing::Write(ofstream & out, const bool & f) const {
     if (f) out << HPBEING_CHAR << " ";
     this->Being::Write(out, false);
     out << hp;
@@ -199,7 +201,7 @@ void TestBeing::Read(ifstream & in) {
     this->Being::Read(in);
     in >> value;
 }
-void TestBeing::Write(ofstream & out, const bool & f) {
+void TestBeing::Write(ofstream & out, const bool & f) const {
     if (f) out << TESTBEING_CHAR << " ";
     this->Being::Write(out, false);
     out << value;
@@ -213,4 +215,17 @@ void TestBeing::PrintInfo(const bool & f){
     cout << "value: " << this->value;
     if (f) cout << endl;
     else cout << ", ";
+}
+
+
+//----------Operators----------
+
+ifstream& operator >> (ifstream & is, Being & being){
+    being.Read(is);
+    return is;
+}
+
+ofstream& operator << (ofstream & os, const Being & being){
+    being.Write(os);
+    return os;
 }

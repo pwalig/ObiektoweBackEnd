@@ -3,6 +3,7 @@
 
 using std::ifstream;
 using std::ofstream;
+using std::string;
 using std::cout;
 using std::endl;
 
@@ -14,9 +15,12 @@ using std::endl;
 
 //----------Armour Static Methods----------
 
-void foo(ifstream & ino){
-    char a;
-    ino >> a;
+Armour* Armour::GetNewArmour(string filename){
+    ifstream in;
+    in.open(filename);
+    Armour* b = Armour::GetNewArmour(in);
+    in.close();
+    return b;
 }
 
 Armour* Armour::GetNewArmour(ifstream & in){
@@ -59,7 +63,8 @@ int Armour::CalculateNewDamage(const int & damage) {
 void Armour::Read(ifstream & in) {
 }
 
-void Armour::Write(std::ofstream & out, const bool & f) {
+void Armour::Write(std::ofstream & out, const bool & f) const {
+    out << ARMOUR_CHAR << " ";
 }
 
 void Armour::PrintInfo(const bool & f) {
@@ -77,7 +82,7 @@ void ConstArmour::Read(ifstream & in) {
     in >> this->reduction;
 }
 
-void ConstArmour::Write(std::ofstream & out, const bool & f) {
+void ConstArmour::Write(std::ofstream & out, const bool & f) const {
     out << CONST_ARMOUR_CHAR << " " << this->reduction << " ";
 }
 
@@ -96,8 +101,8 @@ void ProportionalArmour::Read(std::ifstream & in) {
     in >> this->multiplier;
 }
 
-void ProportionalArmour::Write(std::ofstream & out, const bool & f) {
-    out << CONST_ARMOUR_CHAR << " " << this->multiplier << " ";
+void ProportionalArmour::Write(std::ofstream & out, const bool & f) const {
+    out << PROPORTIONAL_ARMOUR_CHAR << " " << this->multiplier << " ";
 }
 
 void ProportionalArmour::PrintInfo(const bool & f) {
@@ -126,7 +131,7 @@ void MultiArmour::Read(std::ifstream & in) {
     }
 }
 
-void MultiArmour::Write(std::ofstream & out, const bool & f) {
+void MultiArmour::Write(std::ofstream & out, const bool & f) const {
     out << MULTI_ARMOUR_CHAR << " " << this->subArmours.size() << " ";
     int amount = this->subArmours.size();
     for (int i = 0; i < amount; i++) this->subArmours[i]->Write(out);
@@ -148,4 +153,17 @@ MultiArmour::~MultiArmour(){
         delete a;
         subArmours.pop_back();
     }
+}
+
+
+//----------Operators----------
+
+ifstream& operator >> (ifstream & is, Armour & armour){
+    armour.Read(is);
+    return is;
+}
+
+ofstream& operator << (ofstream & os, const Armour & armour){
+    armour.Write(os);
+    return os;
 }
