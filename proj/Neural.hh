@@ -1,4 +1,5 @@
 #pragma once
+
 #include <string>
 
 float FastSigmoid(const float & x);

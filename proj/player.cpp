@@ -1,6 +1,7 @@
 #include "player.hh"
-#include <stdio.h>
-#include "random"
+#include <iostream>
+
+using std::cin;
 
 // PLAYER INTERFACE
 
@@ -32,7 +33,7 @@ HumanPlayer::HumanPlayer(){
 
 int HumanPlayer::GetDecision(const int & _inputSize, float * inputs, const int & requestNo){
     int out = 0;
-    scanf("%d", &out);
+    cin >> out;
     return out;
 }
 

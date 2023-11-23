@@ -1,15 +1,9 @@
 #include "UltimateTicTacToe.hh"
 
-#include <stdio.h>
+#include <iostream>
 
-/*template <typename T>
-void TicTacToeBoard<T>::Fill(const T & value){
-    for (int i = 0; i < 3; i++){
-        for (int i = 0; i < 3; i++){
-            this->board[i][j] = T;
-        }
-    }
-}*/
+using std::cout;
+using std::endl;
 
 
 // TIC TAC TOE BOARD
@@ -115,30 +109,30 @@ TTTBoard UTTTBoard::GetBoardByIndex(const int & _id){
 }
 
 void UTTTBoard::Render(){
-    printf("Main Board:\n");
+    cout << "Main Board:\n";
     for (int j = 0; j < 9; j++){
-        if (j == 3 || j == 6) printf("---+---+---\n");
+        if (j == 3 || j == 6) cout << "---+---+---\n";
         for (int i = 0; i < 9; i++){
-            if (i == 3 || i == 6) printf("|");
+            if (i == 3 || i == 6) cout << "|";
             int _board = i / 3;
             int _field = i % 3;
             if (j >= 3) j >= 6 ? _board += 6 : _board += 3;
             _field += (j % 3) * 3;
-            printf("%c", boards[_board].fields[_field]);
+            cout << boards[_board].fields[_field];
         }
-        printf("\n");
+        cout << endl;
     }
 }
 
 void UTTTBoard::HelperBoard(const int & _curBoard){
-    printf("Helper Board:\n");
+    cout << "Helper Board:\n";
     for (int i = 0; i < 9; i++){
-        if (i == 3 || i == 6) printf("-+-+-\n");
-        if (i % 3 != 0) printf("|");
+        if (i == 3 || i == 6) cout << "-+-+-\n";
+        if (i % 3 != 0) cout << "|";
         char symbol = (_curBoard == i && wins[i] == EMPTY_MARK) ? '?' : wins[i];
         if (boards[i].IsFull() && wins[i] == EMPTY_MARK) symbol = '#';
-        printf("%c", symbol);
-        if (i % 3 == 2) printf("\n");
+        cout << symbol;
+        if (i % 3 == 2) cout << endl;
     }
 }
 
@@ -268,14 +262,14 @@ void UltimateTicTacToe::Play() {
     curBoard = -1;
     board.Reset();
     while(true) {
-        if (display[curPlayer]) printf("\n-----%c turn-----\n", marks[curPlayer]);
+        if (display[curPlayer]) cout << "\n-----" << marks[curPlayer] << " turn-----\n";
         if (display[curPlayer] || forceDisplay) {board.Render(); board.HelperBoard(curBoard);} //render board
 
         // board choice
         if (curBoard < 0) {
             int requestNo = 0;
             do {
-                if (display[curPlayer]) printf("Choose board: ");
+                if (display[curPlayer]) cout << "Choose board: ";
                 float* boardState = GetBoardState(curPlayer);
                 choice = this->players[curPlayer]->GetDecision(UltimateTicTacToe::outputs, boardState, requestNo);
                 delete [] boardState;
@@ -288,7 +282,7 @@ void UltimateTicTacToe::Play() {
         int requestNo = 0;
         // field choice
         do {
-            if (display[curPlayer]) printf("Choose field on board %d: ", curBoard);
+            if (display[curPlayer]) cout << "Choose field on board " << curBoard << ": ";
             float* boardState = GetBoardState(curPlayer);
             choice = this->players[curPlayer]->GetDecision(UltimateTicTacToe::outputs, boardState, requestNo);
             delete [] boardState;

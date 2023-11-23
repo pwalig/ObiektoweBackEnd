@@ -5,6 +5,8 @@
 
 #include <string>
 
+using utility::QuickSortStructuresByKey;
+
 LearningAlgorithm::LearningAlgorithm():game(nullptr), generationSize(0), hiddenLayersCount(0), hiddenLayerSizes(nullptr){}
 
 LearningAlgorithm::LearningAlgorithm(Game* _game):game(_game), generationSize(0), generationsCount(0), hiddenLayersCount(0), hiddenLayerSizes(nullptr){ }

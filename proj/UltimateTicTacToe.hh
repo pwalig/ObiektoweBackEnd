@@ -2,15 +2,6 @@
 
 #include "Game.hh"
 
-/*template <typename T>
-class TicTacToeBoard {
-    public:
-    T board [3][3];
-
-    template <typename T>
-    void Fill(const T & value);
-};*/
-
 #define EMPTY_MARK ' '
 
 // Tic Tac Toe Board

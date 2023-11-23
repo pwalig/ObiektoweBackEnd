@@ -2,21 +2,24 @@
 
 #include <cmath>
 
+namespace utility {
+    
+
 template <typename T>
-void CustomSwap(T & a, T & b){
+inline void CustomSwap(T & a, T & b){
     T p = a;
     a = b;
     b = p;
 }
 
 template  <typename T>
-T RandomT(const T & _min, const T & _max){
+inline T RandomT(const T & _min, const T & _max){
     if (_min == _max) return _min;
     return _min + static_cast <T> (rand()) /( static_cast <T> (RAND_MAX/(_max-_min)));
 }
 
 template  <typename T>
-T* RandomTList(const int & _size, const T & _min, const T & _max){
+inline T* RandomTList(const int & _size, const T & _min, const T & _max){
     T* out = new T [_size];
     for (int i = 0; i < _size; i++){
         out[i] = RandomFloat(_min, _max);
@@ -25,7 +28,7 @@ T* RandomTList(const int & _size, const T & _min, const T & _max){
 }
 
 template  <typename T, typename U>
-int partition(T* structures, U* keys, const int & start, const int & end, const bool & ascendingOrder)
+inline int partition(T* structures, U* keys, const int & start, const int & end, const bool & ascendingOrder)
 {
     int startPivot = (start + end) / 2;
     U pivot = keys[startPivot];
@@ -65,7 +68,7 @@ int partition(T* structures, U* keys, const int & start, const int & end, const 
 }
  
 template  <typename T, typename U>
-void quickSort(T* structures, U* keys, const int & start, const int & end, const bool & ascendingOrder)
+inline void quickSort(T* structures, U* keys, const int & start, const int & end, const bool & ascendingOrder)
 {
  
     // base case
@@ -83,13 +86,13 @@ void quickSort(T* structures, U* keys, const int & start, const int & end, const
 }
 
 template  <typename T, typename U>
-void QuickSortStructuresByKey(const int & siz, T* structures, U* keys, const bool & ascendingOrder){
+inline void QuickSortStructuresByKey(const int & siz, T* structures, U* keys, const bool & ascendingOrder){
     quickSort(structures, keys, 0, siz - 1, ascendingOrder);
 }
 
 
 template  <typename T, typename U>
-void BubbleSortStructuresByKey(const int & siz, T* structures, U* keys, const bool & ascendingOrder){
+inline void BubbleSortStructuresByKey(const int & siz, T* structures, U* keys, const bool & ascendingOrder){
     for (int j = 0; j < siz; j++){
         for (int i = 0; i < siz - j - 1; i++){
             if ((ascendingOrder && keys[i] > keys[i+1]) || (!ascendingOrder && keys[i] < keys[i+1])){
@@ -99,3 +102,5 @@ void BubbleSortStructuresByKey(const int & siz, T* structures, U* keys, const bo
         }
     }
 }
+
+} // namespace utility

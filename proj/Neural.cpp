@@ -1,11 +1,13 @@
 #include "Neural.hh"
 #include "UtilityFunctions.hh"
 
-#include <cmath>
-#include <stdio.h>
+#include <cmath> // abs()
 
 #include <iostream>
 #include <fstream>
+
+using std::string;
+using std::endl;
 
 // UTILS
 
@@ -668,8 +670,7 @@ int* NeuralNetwork::GetSortedDecisions(){
     for (int i = 0; i < siz; i++){
         out[i] = i;
     }
-
-    QuickSortStructuresByKey<int, float>(siz, out, activations, false);
+    utility::QuickSortStructuresByKey<int, float>(siz, out, activations, false);
 
     delete [] activations;
     return out;
@@ -700,15 +701,15 @@ void NeuralNetwork::PrintInfo(const bool & _skipInputLayer, const bool & _neuron
 }
 
 
-void NeuralNetwork::SaveNetwork(const std::string & filename){
+void NeuralNetwork::SaveNetwork(const string & filename){
     std::ofstream file(filename);
 
-    file << this->layers << std::endl;
+    file << this->layers << endl;
 
     for (int i = 0; i < this->layers; i++) {
         file << this->layerSizes[i] << ' ';
     }
-    file << std::endl;
+    file << endl;
 
     for (int i = 1; i < this->layers; i++) {
         for (int j = 0; j < this->layerSizes[i]; j++) {
@@ -716,22 +717,22 @@ void NeuralNetwork::SaveNetwork(const std::string & filename){
             for (int k = 0; k < this->neurons[i][j].connectionsCount; k++) {
                 file << this->neurons[i][j].connections[k].weight << ' ';
             }
-            file << std::endl;
+            file << endl;
         }
     }
 
     file.close();
 }
 
-void NeuralNetwork::SaveNetwork(const NeuralNetwork & nn, const std::string & filename){
+void NeuralNetwork::SaveNetwork(const NeuralNetwork & nn, const string & filename){
     std::ofstream file(filename);
 
-    file << nn.layers << std::endl;
+    file << nn.layers << endl;
 
     for (int i = 0; i < nn.layers; i++) {
         file << nn.layerSizes[i] << ' ';
     }
-    file << std::endl;
+    file << endl;
 
     for (int i = 1; i < nn.layers; i++) {
         for (int j = 0; j < nn.layerSizes[i]; j++) {
@@ -739,14 +740,14 @@ void NeuralNetwork::SaveNetwork(const NeuralNetwork & nn, const std::string & fi
             for (int k = 0; k < nn.neurons[i][j].connectionsCount; k++) {
                 file << nn.neurons[i][j].connections[k].weight << ' ';
             }
-            file << std::endl;
+            file << endl;
         }
     }
 
     file.close();
 }
 
-NeuralNetwork NeuralNetwork::ReadNetwork(const std::string & filename){
+NeuralNetwork NeuralNetwork::ReadNetwork(const string & filename){
     std::ifstream file(filename);
 
     int layers;
