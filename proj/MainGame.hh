@@ -17,6 +17,8 @@ class Board{
     int Move(const int & x1, const int & y1, const int & x2, const int & y2);
     Being* GetBeing(const int & x, const int & y);
     int SetBeing(Being* b, const int & x, const int & y);
+    int AddBeing(Being* b, const int & x, const int & y);
+    int RemoveBeing(Being* b, const int & x, const int & y);
 
     friend class MainGame;
 };
@@ -47,5 +49,6 @@ class MainGame{
     Board* GetBoard();
     void Destroy(Being* being);
 
+    void Play(const std::string & filename);
     void PrintInfo();
 };

@@ -31,18 +31,10 @@ Being* Board::GetBeing(const int & x, const int & y)
 
 int Board::Move(const int & x1, const int & y1, const int & x2, const int & y2)
 {
-    if(x1 < 0 || x1 >= this->fields.size())
-        return 1;
-    if(y1 < 0 || y1 >= this->fields[x1].size())
-        return 2;
-    if(x2 < 0 || x2 >= this->fields.size())
-        return 3;
-    if(y2 < 0 || y2 >= this->fields[x2].size())
-        return 4;
-    if(this->fields[x1][y1] == nullptr)
-        return 5;
-    if(this->fields[x2][y2] != nullptr)
-        return 6;
+    if(x1 < 0 || x1 >= this->fields.size() || y1 < 0 || y1 >= this->fields[x1].size() || x2 < 0 || x2 >= this->fields.size() || y2 < 0 || y2 >= this->fields[x2].size())
+        return 1; // error code - coords are out of bounds
+    if(this->fields[x1][y1] == nullptr || this->fields[x2][y2] != nullptr)
+        return 2; // error code - existence requirements unmet
     this->fields[x2][y2] = this->fields[x1][y1];
     this->fields[x1][y1] = nullptr;
     return 0;
@@ -50,15 +42,25 @@ int Board::Move(const int & x1, const int & y1, const int & x2, const int & y2)
 
 int Board::SetBeing(Being* b, const int & x, const int & y)
 {
-    if(x < 0 || x >= this->fields.size())
-        return 1;
-    if(y < 0 || y >= this->fields[x].size())
-        return 2;
-    if(b == nullptr)
-        return 3;
-    if(this->fields[x][y] != nullptr)
-        return 4;
+    if(x < 0 || x >= this->fields.size() || y < 0 || y >= this->fields[x].size())
+        return 1; // error code - being to be set out of bounds
     this->fields[x][y] = b;
+    return 0;
+}
+
+int Board::AddBeing(Being* b, const int & x, const int & y)
+{
+    if(this->fields[x][y] != nullptr)
+        return 1; // error code - overriding an existing being
+    this->SetBeing(b,x,y);
+    return 0;
+}
+
+int Board::RemoveBeing(Being* b, const int & x, const int & y)
+{
+    if(this->fields[x][y] == nullptr)
+        return 1; // error code - removing from an empty field
+    this->fields[x][y] = nullptr;
     return 0;
 }
 
@@ -103,7 +105,7 @@ void MainGame::ReadBoardState(const string & filename){
 }
 
 void MainGame::SaveBoardState(const string & filename){
-
+    
 }
 
 void MainGame::SortBeingsByPriority(){
@@ -150,7 +152,27 @@ void MainGame::Destroy(Being* being)
 {
     int x = being->GetX();
     int y = being->GetY();
+    for(int i=0; i<2; i++)
+        for(int j=0; j<playerBeings[i].size(); j++)
+        {
+            if(playerBeings[i][j]->GetX()==x && playerBeings[i][j]->GetY() == y)
+            {
+                playerBeings[i].erase(playerBeings[i].begin() + j);
+                break;
+            }
+        }
+    delete being;
     this->board.fields[x][y] = nullptr;
+}
+
+void MainGame::Play(const string & filename)
+{
+    while(playerBeings[0].size()>0 && playerBeings[1].size()>0)
+    {
+        this->Update();
+        this->SaveBoardState(filename);
+    }
+    return;
 }
 
 void MainGame::PrintInfo(){
