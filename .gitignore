@@ -2,4 +2,5 @@
 !proj/
 !proj/*.cpp
 !proj/*.hh
+!proj/*.hpp
 proj/test_main.cpp
