@@ -272,7 +272,6 @@ void MainGame::Play(const string &filename, const int &format, int iterations)
     for(int ctr=0; ctr<iterations; ctr++)
     {
         this->Update();
-        cout << std::to_string(ctr)+filename << endl;
         this->SaveBoardState(filename + std::to_string(ctr)+ ".json", format);
     }
     return;

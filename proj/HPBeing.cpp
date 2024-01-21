@@ -50,9 +50,8 @@ void HPBeing::Write(ofstream & out, const bool & f) const {
 }
 
 json HPBeing::Write(){
-    json data;
+    json data = Being::Write();
     data["type"] = HPBEING_CHAR;
-    this->Being::Write();
     data["hp"] = hp;
     data["armour"] = armour->Write();
     return data;

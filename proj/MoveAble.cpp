@@ -41,9 +41,8 @@ void MoveAble::Write(ofstream & out, const bool & f) const {
 }
 
 json MoveAble::Write(){
-    json data;
+    json data = HPBeing::Write();
     data["type"] = MOVEABLE_CHAR;
-    this->HPBeing::Write();
     data["moveX"] = moveX;
     data["moveY"] = moveY;
     return data;

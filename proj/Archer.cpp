@@ -29,13 +29,13 @@ void Archer::Act() {
 
 
 void Archer::Read(ifstream & in) {
-    this->HPBeing::Read(in);
+    this->MoveAble::Read(in);
     in >> this->moveX;
     in >> this->moveY;
 }
 
 void Archer::Read(const json & data) {
-    this->HPBeing::Read(data);
+    this->MoveAble::Read(data);
     this->damage = data["damage"];
     this->range = data["range"];
 }
@@ -43,16 +43,15 @@ void Archer::Read(const json & data) {
 
 void Archer::Write(ofstream & out, const bool & f) const {
     if (f) out << MOVEABLE_CHAR << " ";
-    this->HPBeing::Write(out, false);
+    this->MoveAble::Write(out, false);
     out << this->damage << " " << this->range;
     if (f) out << endl;
     else out << " ";
 }
 
 json Archer::Write(){
-    json data;
+    json data = MoveAble::Write();
     data["type"] = MOVEABLE_CHAR;
-    this->HPBeing::Write();
     data["damage"] = damage;
     data["range"] = range;
     return data;
@@ -60,7 +59,7 @@ json Archer::Write(){
 
 void Archer::PrintInfo(const bool & f) {
     if (f) cout << "type: Archer, ";
-    this->HPBeing::PrintInfo(false);
+    this->MoveAble::PrintInfo(false);
     cout << "damage: " << this->damage << ", range: " << this->range;
     if (f) cout << endl;
     else cout << ", ";

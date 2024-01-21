@@ -96,9 +96,8 @@ void Knight::Write(ofstream & out, const bool & f) const {
 }
 
 json Knight::Write(){
-    json data;
+    json data = HPBeing::Write();
     data["type"] = KNIGHT_CHAR;
-    this->HPBeing::Write();
     data["baseDamage"] = baseDamage;
     return data;
 }
