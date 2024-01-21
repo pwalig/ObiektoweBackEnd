@@ -11,9 +11,9 @@ class MainGame;
 #include "Being.hh"
 
 
-#define KNIGHT_CHAR 'h'
+#define KNIGHT_CHAR 'k'
 
-class Knight : HPBeing{
+class Knight : public HPBeing{
     protected:
     int baseDamage;
     public:
