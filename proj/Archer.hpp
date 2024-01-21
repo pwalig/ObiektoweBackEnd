@@ -1,19 +1,19 @@
 #pragma once
 
-#include "HPBeing.hpp"
+#include "MoveAble.hpp"
 
+#define ARCHER_CHAR 'a'
 
-#define KNIGHT_CHAR 'k'
-
-class Knight : public HPBeing{
+class Archer : public MoveAble{
     protected:
-    int baseDamage;
+    int damage = 10;
+    int range = 3;
+
     public:
     virtual void Act();
-    
-    int GetBaseDamage() const;
-    virtual void SetBaseDamage(const int dam);
 
+    // Required format:
+    // <type = 'h'> <x> <y> <priority> <hp> <armour type> <armour parameters>
     virtual void Read(std::ifstream & in);
     virtual void Read(const nlohmann::json & data);
     virtual void Write(std::ofstream & out, const bool & f = true) const;

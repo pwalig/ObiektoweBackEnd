@@ -2,6 +2,7 @@
 #include "HPBeing.hpp"
 #include "MoveAble.hpp"
 #include "Knight.hh"
+#include "Archer.hpp"
 #include <fstream>
 
 using std::ifstream;
@@ -35,6 +36,10 @@ Being* Being::GetNewBeing(const char & type){
     
     case KNIGHT_CHAR:
         return new Knight();
+        break;
+        
+    case ARCHER_CHAR:
+        return new Archer();
         break;
     
     default:

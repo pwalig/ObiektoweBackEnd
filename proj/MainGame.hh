@@ -6,6 +6,9 @@
 class Being;
 #include "Being.hh"
 
+#define fstreamReading 0
+#define jsonReading 1
+
 class Board{
     std::vector<std::vector<Being*>> fields;
 

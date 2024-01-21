@@ -13,9 +13,6 @@ using std::ofstream;
 using std::string;
 using std::vector;
 
-#define fstreamReading 0
-#define jsonReading 1
-
 //----------Board----------
 
 Board::Board(const int &_siz)
@@ -37,6 +34,7 @@ int Board::GetFieldsSize() const
 }
 Being *Board::GetBeing(const int &x, const int &y)
 {
+    if (x < 0 || x >= this->fields.size() || y < 0 || y >= this->fields[x].size()) return nullptr;
     return this->fields[x][y];
 }
 
@@ -274,7 +272,8 @@ void MainGame::Play(const string &filename, const int &format, int iterations)
     for(int ctr=0; ctr<iterations; ctr++)
     {
         this->Update();
-        this->SaveBoardState(std::to_string(ctr)+filename, format);
+        cout << std::to_string(ctr)+filename << endl;
+        this->SaveBoardState(filename + std::to_string(ctr)+ ".json", format);
     }
     return;
 }
