@@ -11,6 +11,10 @@ using nlohmann::json;
 
 void HPBeing::Act() {}
 
+int HPBeing::GetHP() const
+{
+    return this->hp;
+}
 
 void HPBeing::DealDamage(const int & damage){
     hp -= armour->CalculateNewDamage(damage);

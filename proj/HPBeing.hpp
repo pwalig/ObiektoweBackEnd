@@ -11,6 +11,7 @@ class HPBeing : public Being{
     Armour* armour;
 
     public:
+    int GetHP() const;
     virtual void Act();
 
     // Reduces this Being's hp.

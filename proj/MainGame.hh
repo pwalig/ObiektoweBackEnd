@@ -11,7 +11,7 @@ class Board{
 
     public:
     Board(const int & siz);
-
+    int GetFieldsSize() const;
     void ReadBoardState(const std::string & filename);
     void SaveBoardState(const std::string & filename);
     int Move(const int & x1, const int & y1, const int & x2, const int & y2);

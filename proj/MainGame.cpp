@@ -31,6 +31,10 @@ Board::Board(const int &_siz)
     }
 }
 
+int Board::GetFieldsSize() const
+{
+    return this->fields.size();
+}
 Being *Board::GetBeing(const int &x, const int &y)
 {
     return this->fields[x][y];
