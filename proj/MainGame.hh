@@ -36,19 +36,20 @@ class MainGame{
     std::vector<Being*> GetCallQueue();
 
     public:
-    MainGame(const std::string & filename);
+    MainGame(const std::string & filename, const int & format);
     ~MainGame();
 
     void AddBeing(const int & playerId, Being* being, const int & x, const int & y);
 
-    void ReadBoardState(const std::string & filename);
-    void SaveBoardState(const std::string & filename);
+    void ReadBoardState(const std::string & filename, const int & format);
+    void SaveBoardState(const std::string & filename, const int & format);
+    void SaveBoardStateJson(const std::string & filename);
 
     void Update();
     void UpdateByPlayer();
     Board* GetBoard();
     void Destroy(Being* being);
 
-    void Play(const std::string & filename);
+    void Play(const std::string & filename, const int & format, int iterations);
     void PrintInfo();
 };

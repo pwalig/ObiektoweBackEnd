@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <vector>
+#include "json.hpp"
 
 class Armour {
     public:
@@ -10,11 +11,13 @@ class Armour {
     // Required format:
     // <type = 'a'>
     virtual void Read(std::ifstream & in);
+    virtual void Read(nlohmann::json & data);
     virtual void Write(std::ofstream & out, const bool & f = true) const;
+    virtual nlohmann::json Write();
     virtual void PrintInfo(const bool & f = true);
     
     static Armour* GetNewArmour(std::ifstream & in);
-    static Armour* GetNewArmour(std::string filename);    
+    static Armour* GetNewArmour(nlohmann::json data);    
 };
 
 class ConstArmour : public Armour {
@@ -26,7 +29,9 @@ class ConstArmour : public Armour {
     // Required format:
     // <type = 'c'> <reduction>
     void Read(std::ifstream & in) override;
+    void Read(nlohmann::json & data) override;
     void Write(std::ofstream & out, const bool & f = true) const override;
+    nlohmann::json Write() override;
     void PrintInfo(const bool & f = true) override;
 };
 
@@ -39,7 +44,9 @@ class ProportionalArmour : public Armour {
     // Required format:
     // <type = 'p'> <multiplier>
     void Read(std::ifstream & in) override;
+    void Read(nlohmann::json & data) override;
     void Write(std::ofstream & out, const bool & f = true) const override;
+    nlohmann::json Write() override;
     void PrintInfo(const bool & f = true) override;
 };
 
@@ -55,7 +62,9 @@ class MultiArmour : public Armour {
     // Required format:
     // <type = 'm'> <sub-armours amount> <sub-armour-1 type> <sub-armour-1 parameters> ...
     void Read(std::ifstream & in) override;
+    void Read(nlohmann::json & data) override;
     void Write(std::ofstream & out, const bool & f = true) const override;
+    nlohmann::json Write() override;
     void PrintInfo(const bool & f = true) override;
 
     ~MultiArmour();

@@ -7,6 +7,7 @@ using std::string;
 using std::vector;
 using std::cout;
 using std::endl;
+using nlohmann::json;
 
 #define BEING_CHAR 'b'
 #define HPBEING_CHAR 'h'
@@ -15,11 +16,29 @@ using std::endl;
 
 // ----------Being Static Methods----------
 
-Being* Being::GetNewBeing(string filename){
-    ifstream in;
-    in.open(filename);
-    Being* b = Being::GetNewBeing(in);
-    in.close();
+Being* Being::GetNewBeing(json data){
+    int t;
+    t = data["type"];
+    Being *b;
+    switch(t)
+    {
+        case BEING_CHAR:
+        b = new Being();
+        break;
+        
+    case TESTBEING_CHAR:
+        b = new TestBeing();
+        break;
+        
+    case HPBEING_CHAR:
+        b = new HPBeing();
+        break;
+    
+    default:
+        b = new Being();
+        break;
+    }
+    b->Read(data);
     return b;
 }
 
@@ -110,15 +129,34 @@ int Being::GetX(){
     return this->x;
 }
 int Being::GetY(){
+ 
     return this->y;
 }
+int Being::GetOwner(){
+    return this->owner;
+}
+
 int Being::GetPriority(){
     return this->priority;
 }
+
+void Being::SetX(const int val){
+    this->x = val;
+}
+void Being::SetY(const int val){
+    this->y = val;
+}
+void Being::SetOwner(const int val){
+    this->owner = val;
+}
+void Being::SetPriority(const int val){
+    this->priority = val;
+}
+
+
 void Being::SetGame(MainGame* mg){
     this->game = mg;
 }
-
 
 
 // ----------Being----------
@@ -130,12 +168,32 @@ void Being::Read(ifstream & in) {
     in >> y;
     in >> priority;
 }
+
+void Being::Read(json & data)
+{
+    x = data["x"];
+    y = data["y"];
+    owner = data["owner"];
+    priority = data["priority"];
+}
+
 void Being::Write(ofstream & out, const bool & f) const {
     if (f) out << BEING_CHAR << " ";
     out << x << " " << y << " " << priority;
     if (f) out << endl;
     else out << " ";
 }
+
+json Being::Write(){
+    json data;
+    data["type"] = BEING_CHAR;
+    data["x"]=this->GetX();
+    data["y"]=this->GetY();
+    data["owner"]=this->GetOwner();
+    data["priority"]=this->GetPriority();
+    return data;
+}
+
 
 void Being::PrintInfo(const bool & f){
     if (f) cout << "type: Being, ";
@@ -168,6 +226,12 @@ void HPBeing::Read(ifstream & in) {
     armour = Armour::GetNewArmour(in);
 }
 
+void HPBeing::Read(json & data) {
+    this->Being::Read(data);
+    hp = data["hp"];
+    armour = Armour::GetNewArmour(data["armour"]);
+}
+
 void HPBeing::Write(ofstream & out, const bool & f) const {
     if (f) out << HPBEING_CHAR << " ";
     this->Being::Write(out, false);
@@ -175,6 +239,15 @@ void HPBeing::Write(ofstream & out, const bool & f) const {
     armour->Write(out);
     if (f) out << endl;
     else out << " ";
+}
+
+json HPBeing::Write(){
+    json data;
+    data["type"] = HPBEING_CHAR;
+    this->Being::Write();
+    data["hp"] = hp;
+    data["armour"] = armour->Write();
+    return data;
 }
 
 void HPBeing::PrintInfo(const bool & f) {
@@ -201,12 +274,26 @@ void TestBeing::Read(ifstream & in) {
     this->Being::Read(in);
     in >> value;
 }
+
+void TestBeing::Read(json & data) {
+    this->Being::Read(data);
+    value = data["hp"];
+}
+
 void TestBeing::Write(ofstream & out, const bool & f) const {
     if (f) out << TESTBEING_CHAR << " ";
     this->Being::Write(out, false);
     out << value;
     if (f) out << endl;
     else out << " ";
+}
+
+json TestBeing::Write(){
+    json data;
+    data["type"] = TESTBEING_CHAR;
+    this->Being::Write();
+    data["value"] = value;
+    return data;
 }
 
 void TestBeing::PrintInfo(const bool & f){

@@ -6,31 +6,41 @@
 
 class MainGame;
 #include "MainGame.hh"
+#include "json.hpp"
 #include "Armour.hh"
 
 class Being{
     protected:
     int x;
     int y;
+    int owner;
     int priority;
     MainGame* game;
 
     public:
     int GetX();
     int GetY();
+    void SetX(const int val);
+    void SetY(const int val);
+    void SetPriority(const int val);
+    void SetOwner(const int val);
+    int GetOwner();
     int GetPriority();
     void SetGame(MainGame* mg);
+    
 
     virtual void Act();
 
     // Required format:
     // <type = 'b'> <x> <y> <priority>
     virtual void Read(std::ifstream & in);
+    virtual void Read(nlohmann::json & data);
     virtual void Write(std::ofstream & out, const bool & f = true) const;
+    virtual nlohmann::json Write();
     virtual void PrintInfo(const bool & f = true);
     
     static Being* GetNewBeing(std::ifstream & in);
-    static Being* GetNewBeing(std::string filename);
+    static Being* GetNewBeing(nlohmann::json data);
     static int partitionBeingsByPriority(std::vector<Being*> & beings, const int & start, const int & end, const bool & ascendingOrder);
     static void quickSortBeingsByPriority(std::vector<Being*> & beings, const int & start, const int & end, const bool & ascendingOrder);
 };
@@ -56,7 +66,9 @@ class HPBeing : public Being{
     // Required format:
     // <type = 'h'> <x> <y> <priority> <hp> <armour type> <armour parameters>
     virtual void Read(std::ifstream & in);
+    virtual void Read(nlohmann::json & data);
     virtual void Write(std::ofstream & out, const bool & f = true) const;
+    virtual nlohmann::json Write();
     virtual void PrintInfo(const bool & f = true);
 
     ~HPBeing();
@@ -71,7 +83,9 @@ class TestBeing : public Being{
     // Required format:
     // <type = 't'> <x> <y> <priority> <value>
     virtual void Read(std::ifstream & in);
+    virtual void Read(nlohmann::json & data);
     virtual void Write(std::ofstream & out, const bool & f = true) const;
+    virtual nlohmann::json Write();
     virtual void PrintInfo(const bool & f = true);
 };
 
