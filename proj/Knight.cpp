@@ -54,15 +54,18 @@ void Knight::Act()
                 }
             }
     }
-    HPBeing* ptr = dynamic_cast<HPBeing*>(game->GetBoard()->GetBeing(x+moveHor, y+moveVer));
-    if(DealDamage(ptr, baseDamage) <= 0)
+    if(moveHor != 0 && moveVer != 0)
     {
-        int erCode = game->GetBoard()->Move(x, y, x+moveHor, y+moveVer);
-        if (erCode == 0){
-            x += moveHor;
-            y += moveVer;
-        }
-    }    
+        HPBeing* ptr = dynamic_cast<HPBeing*>(game->GetBoard()->GetBeing(x+moveHor, y+moveVer));
+        if(DealDamage(ptr, baseDamage) <= 0)
+        {
+            int erCode = game->GetBoard()->Move(x, y, x+moveHor, y+moveVer);
+            if (erCode == 0){
+                x += moveHor;
+                y += moveVer;
+            }
+        }    
+    }
 }
 
 int Knight::GetBaseDamage() const
