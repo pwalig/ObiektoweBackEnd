@@ -2,6 +2,7 @@
 #include <fstream>
 #include <string>
 #include <iostream>
+#include <algorithm>
 #include "json.hpp"
 
 using nlohmann::json;
@@ -187,8 +188,12 @@ void MainGame::SaveBoardState(const string &filename, const int &format)
 
 void MainGame::SortBeingsByPriority()
 {
-    for (int i = 0; i < playerBeings.size(); i++)
-        Being::quickSortBeingsByPriority(playerBeings[i], 0, playerBeings[i].size() - 1, false);
+    for (int i = 0; i < playerBeings.size(); i++) {
+        std::sort(playerBeings[i].begin(), playerBeings[i].end(), [](const Being* a, const Being* b)
+        { 
+            return a->GetPriority() < b->GetPriority();
+        });
+    }
 }
 
 vector<Being *> MainGame::GetCallQueue()
@@ -203,7 +208,10 @@ vector<Being *> MainGame::GetCallQueue()
             callQueue.push_back(playerBeings[i][j]);
         }
     }
-    Being::quickSortBeingsByPriority(callQueue, 0, callQueue.size() - 1, false);
+    std::sort(callQueue.begin(), callQueue.end(), [](const Being* a, const Being* b)
+    { 
+        return a->GetPriority() < b->GetPriority();
+    });
     return callQueue;
 }
 
