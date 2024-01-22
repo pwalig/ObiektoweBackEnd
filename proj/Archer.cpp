@@ -11,15 +11,15 @@ using nlohmann::json;
 
 void Archer::Act() {
     this->MoveAble::Act();
-    int dirs = 0;
+    int dist = 0;
     Being * b = nullptr;
     do {
-        Being* b = game->GetBoard()->GetBeing(x + range, y);
-        if (b == nullptr) Being* b = game->GetBoard()->GetBeing(x, y + range);
-        if (b == nullptr) Being* b = game->GetBoard()->GetBeing(x - range, y);
-        if (b == nullptr) Being* b = game->GetBoard()->GetBeing(x, y - range);
-        ++dirs;
-    } while(b == nullptr && dirs < range);
+        ++dist;
+        b = game->GetBoard()->GetBeing(x + dist, y);
+        if (b == nullptr || b->GetOwner() == this->owner) b = game->GetBoard()->GetBeing(x, y + dist);
+        if (b == nullptr || b->GetOwner() == this->owner) b = game->GetBoard()->GetBeing(x - dist, y);
+        if (b == nullptr || b->GetOwner() == this->owner) b = game->GetBoard()->GetBeing(x, y - dist);
+    } while((b == nullptr || b->GetOwner() == this->owner) && dist < range);
     if (b != nullptr) {
         if(HPBeing* ptrHPBeing = dynamic_cast<HPBeing*>(b)) {
             HPBeing::DealDamage(ptrHPBeing, damage);
@@ -51,7 +51,7 @@ void Archer::Write(ofstream & out, const bool & f) const {
 
 json Archer::Write(){
     json data = MoveAble::Write();
-    data["type"] = MOVEABLE_CHAR;
+    data["type"] = ARCHER_CHAR;
     data["damage"] = damage;
     data["range"] = range;
     return data;
