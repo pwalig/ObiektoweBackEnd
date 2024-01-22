@@ -44,7 +44,7 @@ void Knight::Act()
                     Being* bng = game->GetBoard()->GetBeing(x+j, y+i);
                     if(HPBeing* ptrHPBeing = dynamic_cast<HPBeing*>(bng))
                     {
-                        if(ptrHPBeing->GetHP() > max)
+                        if(ptrHPBeing->GetOwner() != this->owner && ptrHPBeing->GetHP() > max)
                         {
                             max = ptrHPBeing->GetHP();
                             moveHor=j;
