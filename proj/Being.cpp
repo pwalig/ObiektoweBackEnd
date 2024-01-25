@@ -44,7 +44,7 @@ Being* Being::GetNewBeing(const char & type){
         break;
     
     case FIGHTER_CHAR:
-        return new Archer();
+        return new Fighter();
         break;
     
     default:
